@@ -17,13 +17,16 @@ Include:
 3. A link to the firm's own page stating it
 4. The date you checked
 
-## Opening a pull request
+## Please open an issue rather than a pull request
 
-- Edit `data/prop-firm-rules.json` only. The README tables are generated from it by hand; they'll be updated to match.
-- Update `verified_date` to the date **you** checked, and set `verified: true` only if you read it from the firm's own documentation.
-- Do not fill an `unconfirmed` field with a plausible value. Leaving it unconfirmed is more useful than a guess.
-- Add a line to `notes` if the plan has a quirk that doesn't fit the schema. The notes are often the most useful part of an entry.
-- Validate before submitting: `python -c "import json; json.load(open('data/prop-firm-rules.json'))"`
+`data/prop-firm-rules.json` is **generated** from the FuturesEdge rules engine, which lives in a separate private repository and is covered by a unit test suite. Editing the JSON directly would be overwritten on the next export.
+
+So corrections are applied to the engine and re-exported. An issue with the firm, plan, field, correct value and source gets carried through — that's the fastest path, and it means the fix also reaches the app rather than only the dataset.
+
+Two conventions that will be preserved when your correction is applied:
+
+- A field is never filled with a plausible value. If something can't be confirmed, it goes in the plan's `notes` instead — see [`docs/known-gaps.md`](docs/known-gaps.md).
+- `notes` are often the most useful part of an entry. If a plan has a quirk that doesn't fit the schema, say so in the issue and it'll be recorded there.
 
 ## Adding a firm
 

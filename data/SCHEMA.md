@@ -1,14 +1,18 @@
 # Schema reference
 
-`data/prop-firm-rules.json` structure and permitted values.
+`data/prop-firm-rules.json`, schema version **2.0**.
+
+This file is **generated** from the FuturesEdge rules engine rather than hand-maintained, so field names mirror the engine's own contract. Corrections go into the engine and are re-exported — see [`../CONTRIBUTING.md`](../CONTRIBUTING.md).
 
 ## Top level
 
 | Field | Type | Notes |
 |---|---|---|
-| `schema_version` | string | Bumped on breaking structural changes. |
-| `last_updated` | date | Last edit to the file. |
-| `firms` | array | One object per firm. |
+| `schema_version` | string | Bumped on breaking structural changes. 2.0 renamed fields to match the engine exactly. |
+| `last_updated` | date | Date of the last export. |
+| `generated_from` | string | Provenance statement. |
+| `firms` | array | Engine-backed firms. Every plan here is `verified: true`. |
+| `research_only` | array | Firms documented from research but NOT encoded in the engine, so not covered by its tests. Prose `key_facts` rather than structured phases, deliberately — so they can't be mistaken for engine data. |
 | `defunct_firms` | array | Firms recorded as collapsed or no longer trustworthy. |
 
 ## Firm object
@@ -16,104 +20,90 @@
 | Field | Type | Notes |
 |---|---|---|
 | `firm` | string | Firm name as it trades. |
-| `asset_classes` | array | `forex`, `cfd`, `futures`, `crypto`, `indices`, `commodities`. |
-| `owner` | string, optional | Parent company where notable (e.g. Breakout → Kraken). |
-| `platform` / `execution_venue` | string, optional | Where trades execute. |
-| `plans` | array | One object per plan. Firms A/B test rules per plan, so plans are the unit of truth — not firms. |
+| `asset_classes` | array | `forex`, `cfd`, `futures`, `crypto`. |
+| `owner` | string, optional | Parent company where notable (Breakout → Kraken). |
+| `execution_venue` | string, optional | Where trades execute (HyroTrader → Bybit). |
+| `firm_note` | string, optional | Scope caveat, e.g. FundedNext's separate futures line not being covered. |
+| `plans` | array | Firms A/B test rules per plan, so the **plan** is the unit of truth — never the firm. |
 
 ## Plan object
 
 | Field | Type | Notes |
 |---|---|---|
+| `plan_id` | string | Stable identifier, matches the engine's preset id. |
 | `plan_name` | string | As marketed by the firm. |
+| `market` | string | `forex`, `futures` or `crypto`. |
 | `verified` | boolean | `true` only if read from the firm's own documentation. |
-| `verified_date` | date or null | Date of that reading. |
-| `source` | string | Where it was read from. |
-| `account_sizes_usd` | array or null | `null` means not captured, not "none offered". |
-| `phases` | array | Ordered. Funded stages are included as a final phase where the firm publishes rules for them. |
-| `notes` | array of strings | Caveats, gotchas, and anything that doesn't fit a field. |
+| `rules_verified` | date | Date of that reading. |
+| `account_sizes_usd` | array or null | `null` means not captured, never "none offered". |
+| `notes` | array of strings | Caveats and gotchas. **Read these** — anything unconfirmed is stated here rather than guessed at in a field. |
+| `phases` | array | Ordered. Present on most plans. |
+| `phases_by_account_size` | object | Present *instead of* `phases` where the numbers don't reduce to one clean percentage across sizes (Apex). Keys are account sizes as strings. |
+
+Consumers must handle both shapes:
+
+```python
+phases = plan.get("phases") or list(plan["phases_by_account_size"].values())[0]
+```
 
 ## Phase object
 
 | Field | Type | Notes |
 |---|---|---|
-| `phase` | integer | 1-indexed. |
-| `phase_name` | string | e.g. `Challenge`, `Verification`, `Trader Stage (funded)`. |
-| `profit_target` | object | See units below. |
-| `daily_loss` | object | See types below. |
-| `max_drawdown` | object | See types below. |
-| `min_trading_days` | integer or null | `null` = not captured. `0` = confirmed none. |
+| `profit_target_pct` | number | Percent of initial balance. `0` means no target — the phase represents a funded stage. |
+| `daily_loss` | object | `{ type, value }`. See below. |
+| `max_drawdown` | object | `{ type, value, locks_at }`. See below. |
+| `min_trading_days` | integer or null | `0` = confirmed none. `null` = not captured. |
+| `min_profitable_days` | integer, optional | Only present where a firm requires it (FundingPips Zero: 7). |
 | `time_limit_days` | integer or null | `null` = no limit. |
-| `consistency` | object | See types below. |
+| `consistency` | object | `{ type, value }`. See below. |
 | `restrictions` | array of strings | Tags, listed below. |
-
-## Value units
-
-`profit_target`, and any dollar-denominated limit, uses one of:
-
-| `unit` | Shape |
-|---|---|
-| `pct_of_initial` | `{ "unit": "pct_of_initial", "value": 10 }` |
-| `usd_by_account_size` | `{ "unit": "usd_by_account_size", "values": { "50000": 3000 } }` |
-| `usd_selectable_at_checkout` | `{ "options_usd": [2000, 1500] }` — the trader picks. |
-| `none` | No target for this phase (funded stages). |
-| `unconfirmed` | Not established. Do not substitute a guess. |
 
 ## `daily_loss.type`
 
 | Value | Meaning |
 |---|---|
-| `none` | No daily limit. |
+| `none` | No daily limit. `value` omitted. |
 | `pct_initial` | Fixed dollar amount derived from the initial balance. Does not grow with the account. |
 | `pct_prior_day` | Percentage of the balance at the daily reset. |
-| `trailing_daily` | The daily limit itself trails. |
-| `eod_soft_limit` | Pauses trading for the day; does **not** fail the account. |
-| `eod` | Evaluated on end-of-day balances; value not captured. |
-| `unconfirmed` | Not established. |
-
-Additional keys: `failing` (boolean — whether breaching fails the account), `measured_on` (`equity_including_open_positions` where the firm specifies it), `reset_time_utc`.
+| `trailing_intraday_high` | The limit itself trails the intraday high. Harshest daily form. |
 
 ## `max_drawdown.type`
 
-| Value | Meaning |
-|---|---|
-| `static` | Fixed % of starting balance. Never moves. |
-| `eod_trail` | Trails highest end-of-day closed balance. |
-| `intraday_trail` | Trails highest unrealised equity peak. |
-| `trailing_high_water_mark` | Trails the high water mark; see `locks_at`. |
-| `eod_fixed_buffer` | Fixed dollar buffer, evaluated end-of-day. |
-| `trailing` | Trails, but the exact basis is not confirmed. |
-| `unconfirmed` | Not established. |
+| Value | `value` unit | Meaning |
+|---|---|---|
+| `static` | percent | Fixed % of starting balance. Never moves. |
+| `eod_trail` | percent | Trails the highest end-of-day closed balance. |
+| `intraday_trail` | percent | Trails the highest unrealised equity peak. |
+| `eod_fixed_buffer` | **dollars** | Fixed dollar buffer, evaluated end-of-day. Not currently used by any engine-backed plan. |
 
-Additional keys: `locks_at` (`null` or `start_balance`), `confidence` (`unconfirmed`, `assumed_static`, `varies_by_plan`).
+`locks_at` is either `none` or `start_balance`. `start_balance` means the floor stops trailing once it reaches the starting balance — see [`../docs/drawdown-taxonomy.md`](../docs/drawdown-taxonomy.md).
 
-Full explanation of each type: [`../docs/drawdown-taxonomy.md`](../docs/drawdown-taxonomy.md).
+Note the unit inconsistency on `eod_fixed_buffer` is deliberate and inherited from the engine: a plan quoting a flat percentage uses `static`, while a plan quoting a flat dollar figure regardless of account size uses `eod_fixed_buffer`. They compute an identical fixed floor; the distinction records how the firm expresses it.
 
 ## `consistency.type`
 
 | Value | Meaning |
 |---|---|
-| `none` | Confirmed no consistency rule. |
+| `none` | Confirmed no consistency rule. `value` omitted. |
 | `best_day_pct_of_total` | No day above X% of total profit. |
 | `best_day_pct_of_positive_days` | No day above X% of profit from winning days only. Stricter than it appears. |
-| `best_trade_pct_of_total` | No single trade above X% of total profit. Cannot be derived from daily balances. |
-| `unconfirmed` | Not established. |
 
-Additional keys: `value_pct`, `applies_to` (`evaluation_only`, `all_stages_including_funded`).
+There is no per-trade consistency type. A per-trade rule is frequently attributed to HyroTrader and is incorrect — see the note in the taxonomy doc.
 
 ## `restrictions` tags
 
 | Tag | Meaning |
 |---|---|
-| `no_weekend_holding` | Positions must be closed before the weekend. |
-| `mandatory_stop_loss_within_5_minutes` | Every position needs a stop within 5 minutes of entry. |
-| `all_positions_closed_to_advance_stage` | Cannot progress a phase with open positions. |
-| `daily_profit_cap_10000_usd` | Maximum profit per day. |
-| `per_trade_profit_cap_10000_usd` | Maximum profit per trade. |
+| `inactivity_60d` | Account closed after 60 days without trading. |
+| `max_loss_per_trade_3pct` | No single trade may lose more than 3% of the account. |
+| `no_martingale` | Martingale / grid position stacking prohibited. |
+| `no_cross_account_hedging` | Cannot hedge one funded account against another. |
+| `lowcap_exposure_5pct` | Low-capitalisation asset exposure capped at 5%. |
 
 ## Conventions
 
-- Percentages are of the initial account balance unless the unit says otherwise.
+- Percentages are of the **initial** account balance unless the type says otherwise.
 - `null` means *not captured*. It never means *zero* or *none*.
 - `0` means *confirmed zero*.
-- A field is marked `unconfirmed` rather than filled with a plausible value. If you need a number that isn't here, get it from the firm.
+- Fields are never filled with a plausible guess. If a value couldn't be confirmed, the plan's `notes` say so.

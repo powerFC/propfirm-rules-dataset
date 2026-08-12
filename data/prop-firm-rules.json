@@ -1,824 +1,1595 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "2.0",
   "dataset_name": "Prop Firm Rules Dataset",
-  "last_updated": "2026-08-07",
+  "last_updated": "2026-08-12",
   "maintainer": "FuturesEdge",
   "homepage": "https://futuresedgetrade.app",
   "license": "CC-BY-4.0",
+  "generated_from": "Exported directly from the FuturesEdge rules engine, which is covered by a unit test suite. The engine is the single source of truth; this file is generated from it so the two cannot drift.",
   "notes": [
-    "Every plan carries a 'verified' flag and 'verified_date'. verified=true means the numbers were read directly from the firm's own rules page or help centre on that date.",
-    "verified=false means the numbers come from secondary sources and have not been confirmed against the firm. Treat them as indicative only.",
-    "Prop firms A/B test rules per plan and change them without notice. Always confirm against the firm's own rules page before paying for an evaluation.",
-    "Percentages are of the initial account balance unless the unit says otherwise."
+    "Every plan carries `verified` and `rules_verified`. verified=true means the numbers were read directly from the firm's own rules page or help centre on that date.",
+    "Percentages are of the INITIAL account balance unless the type says otherwise. For max_drawdown type `eod_fixed_buffer` the value is already a dollar amount.",
+    "Where a plan's target/drawdown/daily-loss do not reduce to one clean percentage across account sizes, it uses `phases_by_account_size` instead of `phases`.",
+    "Prop firms A/B test rules per plan and change them without notice, which is why this dataset is structured per PLAN and not per firm. Always confirm against the firm's own rules page before paying for an evaluation.",
+    "Firms under `research_only` are NOT in the engine and have not been through its tests. Treat them accordingly."
   ],
   "firms": [
     {
       "firm": "FTMO",
-      "asset_classes": ["forex", "cfd", "indices", "commodities"],
+      "asset_classes": [
+        "forex",
+        "cfd"
+      ],
       "plans": [
         {
-          "plan_name": "2-Step Challenge",
+          "plan_id": "ftmo_2step",
+          "plan_name": "2-Step Evaluation",
+          "market": "forex",
           "verified": true,
-          "verified_date": "2026-07-16",
-          "source": "ftmo.com",
-          "account_sizes_usd": null,
+          "rules_verified": "2026-07-16",
+          "account_sizes_usd": [
+            10000,
+            25000,
+            50000,
+            100000,
+            200000
+          ],
+          "notes": [],
           "phases": [
             {
-              "phase": 1,
-              "phase_name": "Challenge",
-              "profit_target": { "unit": "pct_of_initial", "value": 10 },
-              "daily_loss": { "type": "pct_initial", "value_pct": 5, "failing": true },
-              "max_drawdown": { "type": "static", "value_pct": 10, "locks_at": null },
+              "profit_target_pct": 10,
+              "daily_loss": {
+                "type": "pct_initial",
+                "value": 5
+              },
+              "max_drawdown": {
+                "type": "static",
+                "value": 10,
+                "locks_at": "none"
+              },
               "min_trading_days": 4,
               "time_limit_days": null,
-              "consistency": { "type": "none" },
+              "consistency": {
+                "type": "none"
+              },
               "restrictions": []
             },
             {
-              "phase": 2,
-              "phase_name": "Verification",
-              "profit_target": { "unit": "pct_of_initial", "value": 5 },
-              "daily_loss": { "type": "pct_initial", "value_pct": 5, "failing": true },
-              "max_drawdown": { "type": "static", "value_pct": 10, "locks_at": null },
+              "profit_target_pct": 5,
+              "daily_loss": {
+                "type": "pct_initial",
+                "value": 5
+              },
+              "max_drawdown": {
+                "type": "static",
+                "value": 10,
+                "locks_at": "none"
+              },
               "min_trading_days": 4,
               "time_limit_days": null,
-              "consistency": { "type": "none" },
+              "consistency": {
+                "type": "none"
+              },
               "restrictions": []
             }
-          ],
-          "notes": [
-            "Daily loss is a fixed dollar amount derived from the initial balance, not from the current balance. It does not grow as the account grows.",
-            "No consistency rule on the classic 2-step."
           ]
         },
         {
-          "plan_name": "1-Step Challenge",
+          "plan_id": "ftmo_1step",
+          "plan_name": "1-Step Evaluation",
+          "market": "forex",
           "verified": true,
-          "verified_date": "2026-07-16",
-          "source": "ftmo.com",
-          "account_sizes_usd": null,
-          "phases": [
-            {
-              "phase": 1,
-              "phase_name": "Challenge",
-              "profit_target": { "unit": "pct_of_initial", "value": 10 },
-              "daily_loss": { "type": "pct_initial", "value_pct": 3, "failing": true },
-              "max_drawdown": { "type": "trailing", "value_pct": 10, "locks_at": null, "confidence": "unconfirmed" },
-              "min_trading_days": 0,
-              "time_limit_days": null,
-              "consistency": { "type": "best_day_pct_of_positive_days", "value_pct": 50 },
-              "restrictions": []
-            }
+          "rules_verified": "2026-07-16",
+          "account_sizes_usd": [
+            10000,
+            25000,
+            50000,
+            100000,
+            200000
           ],
           "notes": [
-            "Launched February 2026.",
-            "The 'Best Day Rule' caps the best day at 50% of total profit from positive days. It acts as both a consistency rule and an implicit minimum-trading-days requirement.",
-            "Whether the 10% max loss is static or trailing on this plan is not confirmed. Treat max_drawdown.type as unconfirmed."
+            "Drawdown type (static vs trailing) is not confirmed on FTMO's official rules table — encoded as eod_trail (end-of-day trailing) per secondary sources; treat the floor conservatively until confirmed at ftmo.com.",
+            "The evaluation fee is non-refundable on this 1-Step variant, unlike the 2-Step (where it's refunded on a pass)."
+          ],
+          "phases": [
+            {
+              "profit_target_pct": 10,
+              "daily_loss": {
+                "type": "pct_initial",
+                "value": 3
+              },
+              "max_drawdown": {
+                "type": "eod_trail",
+                "value": 10,
+                "locks_at": "none"
+              },
+              "min_trading_days": 0,
+              "time_limit_days": null,
+              "consistency": {
+                "type": "best_day_pct_of_positive_days",
+                "value": 50
+              },
+              "restrictions": []
+            }
           ]
         }
       ]
     },
     {
       "firm": "TopStep",
-      "asset_classes": ["futures"],
+      "asset_classes": [
+        "futures"
+      ],
       "plans": [
         {
-          "plan_name": "Trading Combine",
+          "plan_id": "topstep_50k",
+          "plan_name": "50K Combine",
+          "market": "futures",
           "verified": true,
-          "verified_date": "2026-07-11",
-          "source": "topstep.com",
-          "account_sizes_usd": [50000, 100000, 150000],
-          "phases": [
-            {
-              "phase": 1,
-              "phase_name": "Combine",
-              "profit_target": {
-                "unit": "usd_by_account_size",
-                "values": { "50000": 3000, "100000": 6000, "150000": 9000 }
-              },
-              "daily_loss": { "type": "none", "failing": false },
-              "max_drawdown": {
-                "type": "eod_trail",
-                "unit": "usd_by_account_size",
-                "values": { "50000": 2000, "100000": 3000, "150000": 4500 },
-                "locks_at": "start_balance"
-              },
-              "min_trading_days": null,
-              "time_limit_days": null,
-              "consistency": { "type": "none" },
-              "restrictions": []
-            }
+          "rules_verified": "2026-07-11",
+          "account_sizes_usd": [
+            50000
           ],
           "notes": [
-            "The trailing drawdown follows the highest END-OF-DAY closed balance. Intraday equity spikes do not move it.",
-            "Once the account balance exceeds starting balance + drawdown amount, the drawdown converts to a FIXED floor at the starting balance and stops trailing.",
-            "A Daily Loss Limit exists as a soft guideline per account size but does not fail the evaluation.",
-            "Payout eligibility requires 5 winning days of at least $150 each.",
-            "Account sizes and dollar values should be re-confirmed; TopStep adjusts these periodically."
+            "Payout eligibility (5 winning days ≥ $150) is separate from evaluation pass/fail and not modeled here."
+          ],
+          "phases": [
+            {
+              "profit_target_pct": 6,
+              "daily_loss": {
+                "type": "none"
+              },
+              "max_drawdown": {
+                "type": "eod_trail",
+                "value": 4,
+                "locks_at": "start_balance"
+              },
+              "min_trading_days": 0,
+              "time_limit_days": null,
+              "consistency": {
+                "type": "none"
+              },
+              "restrictions": []
+            }
+          ]
+        },
+        {
+          "plan_id": "topstep_100k",
+          "plan_name": "100K Combine",
+          "market": "futures",
+          "verified": true,
+          "rules_verified": "2026-07-11",
+          "account_sizes_usd": [
+            100000
+          ],
+          "notes": [
+            "Payout eligibility (5 winning days ≥ $150) is separate from evaluation pass/fail and not modeled here."
+          ],
+          "phases": [
+            {
+              "profit_target_pct": 6,
+              "daily_loss": {
+                "type": "none"
+              },
+              "max_drawdown": {
+                "type": "eod_trail",
+                "value": 3,
+                "locks_at": "start_balance"
+              },
+              "min_trading_days": 0,
+              "time_limit_days": null,
+              "consistency": {
+                "type": "none"
+              },
+              "restrictions": []
+            }
+          ]
+        },
+        {
+          "plan_id": "topstep_150k",
+          "plan_name": "150K Combine",
+          "market": "futures",
+          "verified": true,
+          "rules_verified": "2026-07-11",
+          "account_sizes_usd": [
+            150000
+          ],
+          "notes": [
+            "Payout eligibility (5 winning days ≥ $150) is separate from evaluation pass/fail and not modeled here."
+          ],
+          "phases": [
+            {
+              "profit_target_pct": 6,
+              "daily_loss": {
+                "type": "none"
+              },
+              "max_drawdown": {
+                "type": "eod_trail",
+                "value": 3,
+                "locks_at": "start_balance"
+              },
+              "min_trading_days": 0,
+              "time_limit_days": null,
+              "consistency": {
+                "type": "none"
+              },
+              "restrictions": []
+            }
           ]
         }
       ]
     },
     {
       "firm": "Apex Trader Funding",
-      "asset_classes": ["futures"],
+      "asset_classes": [
+        "futures"
+      ],
       "plans": [
         {
-          "plan_name": "Apex 4.0 — EOD Trailing",
+          "plan_id": "apex_eod_trail",
+          "plan_name": "EOD Trail Evaluation",
+          "market": "futures",
           "verified": true,
-          "verified_date": "2026-07-11",
-          "source": "apextraderfunding.com",
-          "account_sizes_usd": [25000, 50000, 100000, 150000],
-          "phases": [
-            {
-              "phase": 1,
-              "phase_name": "Evaluation",
-              "profit_target": {
-                "unit": "usd_by_account_size",
-                "values": { "25000": 1500, "50000": 3000, "100000": 6000, "150000": 9000 }
-              },
-              "daily_loss": {
-                "type": "eod_soft_limit",
-                "unit": "usd_by_account_size",
-                "values": { "25000": 500, "50000": 1000, "100000": 1500, "150000": 2000 },
-                "failing": false
-              },
-              "max_drawdown": {
-                "type": "eod_trail",
-                "unit": "usd_by_account_size",
-                "values": { "25000": 1000, "50000": 2000, "100000": 3000, "150000": 4000 },
-                "locks_at": null
-              },
-              "min_trading_days": 0,
-              "time_limit_days": 30,
-              "consistency": { "type": "none" },
-              "restrictions": []
-            }
+          "rules_verified": "2026-07-11",
+          "account_sizes_usd": [
+            25000,
+            50000,
+            100000,
+            150000
           ],
           "notes": [
-            "The daily loss limit on the EOD variant is SOFT. Hitting it pauses trading for the day; it does not fail the account. Any tracker that treats it as a failing breach will be wrong.",
-            "Consistency rules do not apply during the evaluation. A 50% rule applies on the funded (PA) phase only.",
-            "Funded phase requires an activation fee within 7 days of passing, and contract caps are reduced relative to the evaluation."
-          ]
+            "The daily loss limit is SOFT — hitting it pauses trading for the day but does not fail the account (daily_loss.soft: true; see engine/rules.js).",
+            "Funded (PA) phase — activation fee, contract caps, 50% consistency rule, payout ladder — is not modeled; this preset covers the evaluation phase only."
+          ],
+          "phases_by_account_size": {
+            "25000": [
+              {
+                "profit_target_pct": 6,
+                "daily_loss": {
+                  "type": "pct_initial",
+                  "value": 2,
+                  "value_dollars": 500,
+                  "soft": true
+                },
+                "max_drawdown": {
+                  "type": "eod_trail",
+                  "value": 4,
+                  "value_dollars": 1000,
+                  "locks_at": "none"
+                },
+                "min_trading_days": 0,
+                "time_limit_days": 30,
+                "consistency": {
+                  "type": "none"
+                },
+                "restrictions": []
+              }
+            ],
+            "50000": [
+              {
+                "profit_target_pct": 6,
+                "daily_loss": {
+                  "type": "pct_initial",
+                  "value": 2,
+                  "value_dollars": 1000,
+                  "soft": true
+                },
+                "max_drawdown": {
+                  "type": "eod_trail",
+                  "value": 4,
+                  "value_dollars": 2000,
+                  "locks_at": "none"
+                },
+                "min_trading_days": 0,
+                "time_limit_days": 30,
+                "consistency": {
+                  "type": "none"
+                },
+                "restrictions": []
+              }
+            ],
+            "100000": [
+              {
+                "profit_target_pct": 6,
+                "daily_loss": {
+                  "type": "pct_initial",
+                  "value": 1.5,
+                  "value_dollars": 1500,
+                  "soft": true
+                },
+                "max_drawdown": {
+                  "type": "eod_trail",
+                  "value": 3,
+                  "value_dollars": 3000,
+                  "locks_at": "none"
+                },
+                "min_trading_days": 0,
+                "time_limit_days": 30,
+                "consistency": {
+                  "type": "none"
+                },
+                "restrictions": []
+              }
+            ],
+            "150000": [
+              {
+                "profit_target_pct": 6,
+                "daily_loss": {
+                  "type": "pct_initial",
+                  "value": 1.3333,
+                  "value_dollars": 2000,
+                  "soft": true
+                },
+                "max_drawdown": {
+                  "type": "eod_trail",
+                  "value": 2.6667,
+                  "value_dollars": 4000,
+                  "locks_at": "none"
+                },
+                "min_trading_days": 0,
+                "time_limit_days": 30,
+                "consistency": {
+                  "type": "none"
+                },
+                "restrictions": []
+              }
+            ]
+          }
         },
         {
-          "plan_name": "Apex 4.0 — Intraday Trailing",
+          "plan_id": "apex_intraday_trail",
+          "plan_name": "Intraday Trail Evaluation",
+          "market": "futures",
           "verified": true,
-          "verified_date": "2026-07-11",
-          "source": "apextraderfunding.com",
-          "account_sizes_usd": [25000, 50000, 100000, 150000],
-          "phases": [
-            {
-              "phase": 1,
-              "phase_name": "Evaluation",
-              "profit_target": {
-                "unit": "usd_by_account_size",
-                "values": { "25000": 1500, "50000": 3000, "100000": 6000, "150000": 9000 }
-              },
-              "daily_loss": { "type": "none", "failing": false },
-              "max_drawdown": {
-                "type": "intraday_trail",
-                "unit": "usd_by_account_size",
-                "values": { "25000": 1000, "50000": 2000, "100000": 3000, "150000": 4000 },
-                "locks_at": null
-              },
-              "min_trading_days": 0,
-              "time_limit_days": 30,
-              "consistency": { "type": "none" },
-              "restrictions": []
-            }
+          "rules_verified": "2026-07-11",
+          "account_sizes_usd": [
+            25000,
+            50000,
+            100000,
+            150000
           ],
           "notes": [
-            "The intraday variant has NO daily loss limit at all.",
-            "Intraday trailing follows the highest unrealised equity peak, which makes it the harshest drawdown type in common use. An open position that goes green and then reverses can breach the account even if every trade closes at a profit.",
-            "Tracking this accurately requires logging the session's peak unrealised equity, not just closed balances."
-          ]
-        }
-      ]
-    },
-    {
-      "firm": "MyFundedFutures",
-      "asset_classes": ["futures"],
-      "plans": [
-        {
-          "plan_name": "Core",
-          "verified": true,
-          "verified_date": "2026-07-11",
-          "source": "help.myfundedfutures.com",
-          "account_sizes_usd": [50000, 100000, 150000],
-          "phases": [
-            {
-              "phase": 1,
-              "phase_name": "Evaluation",
-              "profit_target": {
-                "unit": "usd_by_account_size",
-                "values": { "50000": 3000, "100000": 6000, "150000": 9000 }
-              },
-              "daily_loss": { "type": "none", "failing": false },
-              "max_drawdown": { "type": "eod_trail", "value_pct": 3, "locks_at": null },
-              "min_trading_days": null,
-              "time_limit_days": null,
-              "consistency": { "type": "best_day_pct_of_total", "value_pct": 50, "applies_to": "evaluation_only" },
-              "restrictions": []
-            }
+            "Funded (PA) phase — activation fee, contract caps, 50% consistency rule, payout ladder — is not modeled; this preset covers the evaluation phase only."
           ],
-          "notes": ["No daily loss limit on any MyFundedFutures plan. This is the firm's main structural differentiator."]
-        },
-        {
-          "plan_name": "Rapid",
-          "verified": true,
-          "verified_date": "2026-07-11",
-          "source": "help.myfundedfutures.com",
-          "account_sizes_usd": [50000, 100000, 150000],
-          "phases": [
-            {
-              "phase": 1,
-              "phase_name": "Evaluation",
-              "profit_target": {
-                "unit": "usd_by_account_size",
-                "values": { "50000": 3000, "100000": 6000, "150000": 9000 }
-              },
-              "daily_loss": { "type": "none", "failing": false },
-              "max_drawdown": { "type": "intraday_trail", "value_pct": 4, "locks_at": null },
-              "min_trading_days": null,
-              "time_limit_days": null,
-              "consistency": { "type": "none" },
-              "restrictions": []
-            }
-          ],
-          "notes": ["Intraday trailing drawdown. No consistency rule."]
-        },
-        {
-          "plan_name": "Pro",
-          "verified": true,
-          "verified_date": "2026-07-11",
-          "source": "help.myfundedfutures.com",
-          "account_sizes_usd": [50000, 100000, 150000],
-          "phases": [
-            {
-              "phase": 1,
-              "phase_name": "Evaluation",
-              "profit_target": {
-                "unit": "usd_by_account_size",
-                "values": { "50000": 3000, "100000": 6000, "150000": 9000 }
-              },
-              "daily_loss": { "type": "none", "failing": false },
-              "max_drawdown": { "type": "eod_trail", "value_pct": 3, "locks_at": null },
-              "min_trading_days": null,
-              "time_limit_days": null,
-              "consistency": { "type": "none" },
-              "restrictions": []
-            }
-          ],
-          "notes": []
-        },
-        {
-          "plan_name": "Flex",
-          "verified": true,
-          "verified_date": "2026-07-11",
-          "source": "help.myfundedfutures.com",
-          "account_sizes_usd": [50000, 100000, 150000],
-          "phases": [
-            {
-              "phase": 1,
-              "phase_name": "Evaluation",
-              "profit_target": {
-                "unit": "usd_by_account_size",
-                "values": { "50000": 3000, "100000": 6000, "150000": 9000 }
-              },
-              "daily_loss": { "type": "none", "failing": false },
-              "max_drawdown": { "type": "eod_fixed_buffer", "value_pct": 4, "locks_at": null },
-              "min_trading_days": null,
-              "time_limit_days": null,
-              "consistency": { "type": "none" },
-              "restrictions": []
-            }
-          ],
-          "notes": ["Fixed buffer below starting balance, evaluated end-of-day rather than trailing."]
-        },
-        {
-          "plan_name": "Builder",
-          "verified": true,
-          "verified_date": "2026-07-11",
-          "source": "help.myfundedfutures.com",
-          "account_sizes_usd": [50000],
-          "phases": [
-            {
-              "phase": 1,
-              "phase_name": "Evaluation",
-              "profit_target": { "unit": "usd_by_account_size", "values": { "50000": 3000 } },
-              "daily_loss": { "type": "none", "failing": false },
-              "max_drawdown": {
-                "type": "eod_fixed_buffer",
-                "unit": "usd_selectable_at_checkout",
-                "options_usd": [2000, 1500],
-                "locks_at": null
-              },
-              "min_trading_days": null,
-              "time_limit_days": null,
-              "consistency": { "type": "none" },
-              "restrictions": []
-            }
-          ],
-          "notes": ["$50K only. The buffer size is chosen at checkout, so two traders on the same plan can have different drawdown limits."]
+          "phases_by_account_size": {
+            "25000": [
+              {
+                "profit_target_pct": 6,
+                "daily_loss": {
+                  "type": "none"
+                },
+                "max_drawdown": {
+                  "type": "intraday_trail",
+                  "value": 4,
+                  "value_dollars": 1000,
+                  "locks_at": "none"
+                },
+                "min_trading_days": 0,
+                "time_limit_days": 30,
+                "consistency": {
+                  "type": "none"
+                },
+                "restrictions": []
+              }
+            ],
+            "50000": [
+              {
+                "profit_target_pct": 6,
+                "daily_loss": {
+                  "type": "none"
+                },
+                "max_drawdown": {
+                  "type": "intraday_trail",
+                  "value": 4,
+                  "value_dollars": 2000,
+                  "locks_at": "none"
+                },
+                "min_trading_days": 0,
+                "time_limit_days": 30,
+                "consistency": {
+                  "type": "none"
+                },
+                "restrictions": []
+              }
+            ],
+            "100000": [
+              {
+                "profit_target_pct": 6,
+                "daily_loss": {
+                  "type": "none"
+                },
+                "max_drawdown": {
+                  "type": "intraday_trail",
+                  "value": 3,
+                  "value_dollars": 3000,
+                  "locks_at": "none"
+                },
+                "min_trading_days": 0,
+                "time_limit_days": 30,
+                "consistency": {
+                  "type": "none"
+                },
+                "restrictions": []
+              }
+            ],
+            "150000": [
+              {
+                "profit_target_pct": 6,
+                "daily_loss": {
+                  "type": "none"
+                },
+                "max_drawdown": {
+                  "type": "intraday_trail",
+                  "value": 2.6667,
+                  "value_dollars": 4000,
+                  "locks_at": "none"
+                },
+                "min_trading_days": 0,
+                "time_limit_days": 30,
+                "consistency": {
+                  "type": "none"
+                },
+                "restrictions": []
+              }
+            ]
+          }
         }
       ]
     },
     {
       "firm": "FundedNext",
-      "asset_classes": ["forex", "cfd"],
+      "asset_classes": [
+        "forex",
+        "cfd"
+      ],
+      "firm_note": "CFD line only. FundedNext also runs a separate futures line (Flex / Legacy / Rapid) which is not covered here.",
       "plans": [
         {
+          "plan_id": "fundednext_stellar_2step",
           "plan_name": "Stellar 2-Step",
+          "market": "forex",
           "verified": true,
-          "verified_date": "2026-07-16",
-          "source": "fundednext.com",
-          "account_sizes_usd": null,
-          "phases": [
-            {
-              "phase": 1,
-              "phase_name": "Phase 1",
-              "profit_target": { "unit": "pct_of_initial", "value": 8 },
-              "daily_loss": { "type": "pct_initial", "value_pct": 5, "failing": true },
-              "max_drawdown": { "type": "static", "value_pct": 10, "locks_at": null },
-              "min_trading_days": 0,
-              "time_limit_days": null,
-              "consistency": { "type": "none" },
-              "restrictions": []
-            },
-            {
-              "phase": 2,
-              "phase_name": "Phase 2",
-              "profit_target": { "unit": "pct_of_initial", "value": 5 },
-              "daily_loss": { "type": "pct_initial", "value_pct": 5, "failing": true },
-              "max_drawdown": { "type": "static", "value_pct": 10, "locks_at": null },
-              "min_trading_days": 0,
-              "time_limit_days": null,
-              "consistency": { "type": "none" },
-              "restrictions": []
-            }
+          "rules_verified": "2026-07-16",
+          "account_sizes_usd": [
+            10000,
+            25000,
+            50000,
+            100000,
+            200000
           ],
           "notes": [
-            "No consistency rule on the CFD 2-step as of the verification date.",
-            "FundedNext also runs a separate FUTURES product line (Flex, Legacy, Rapid) with different rules. Not encoded here."
+            "Account sizes are not yet re-verified for the Stellar lineup — the list below is a placeholder inherited from the prior preset; confirm at fundednext.com.",
+            "Daily loss includes unrealized (open-position) P&L and resets 00:00 server time — this app only tracks closed daily P&L, so a day with a large intraday open-position drawdown that closed back out won't be reflected here.",
+            "This is the CFD line; FundedNext's separate Futures plans (Flex/Legacy/Rapid) are not covered by this preset."
+          ],
+          "phases": [
+            {
+              "profit_target_pct": 8,
+              "daily_loss": {
+                "type": "pct_initial",
+                "value": 5
+              },
+              "max_drawdown": {
+                "type": "static",
+                "value": 10,
+                "locks_at": "none"
+              },
+              "min_trading_days": 5,
+              "time_limit_days": null,
+              "consistency": {
+                "type": "none"
+              },
+              "restrictions": [
+                "inactivity_60d"
+              ]
+            },
+            {
+              "profit_target_pct": 5,
+              "daily_loss": {
+                "type": "pct_initial",
+                "value": 5
+              },
+              "max_drawdown": {
+                "type": "static",
+                "value": 10,
+                "locks_at": "none"
+              },
+              "min_trading_days": 5,
+              "time_limit_days": null,
+              "consistency": {
+                "type": "none"
+              },
+              "restrictions": [
+                "inactivity_60d"
+              ]
+            }
           ]
         },
         {
+          "plan_id": "fundednext_stellar_1step",
           "plan_name": "Stellar 1-Step",
-          "verified": false,
-          "verified_date": "2026-07-16",
-          "source": "fundednext.com (plan lineup observed, individual rules not confirmed)",
-          "account_sizes_usd": null,
+          "market": "forex",
+          "verified": true,
+          "rules_verified": "2026-07-16",
+          "account_sizes_usd": [
+            10000,
+            25000,
+            50000,
+            100000,
+            200000
+          ],
+          "notes": [
+            "Account sizes are not yet re-verified for the Stellar lineup — the list below is a placeholder inherited from the prior preset; confirm at fundednext.com.",
+            "Daily loss includes unrealized (open-position) P&L and resets 00:00 server time — this app only tracks closed daily P&L, so a day with a large intraday open-position drawdown that closed back out won't be reflected here.",
+            "This is the CFD line; FundedNext's separate Futures plans (Flex/Legacy/Rapid) are not covered by this preset."
+          ],
           "phases": [
             {
-              "phase": 1,
-              "phase_name": "Single Phase",
-              "profit_target": { "unit": "pct_of_initial", "value": 10 },
-              "daily_loss": { "type": "unconfirmed" },
-              "max_drawdown": { "type": "unconfirmed" },
-              "min_trading_days": null,
+              "profit_target_pct": 10,
+              "daily_loss": {
+                "type": "pct_initial",
+                "value": 3
+              },
+              "max_drawdown": {
+                "type": "static",
+                "value": 6,
+                "locks_at": "none"
+              },
+              "min_trading_days": 2,
               "time_limit_days": null,
-              "consistency": { "type": "unconfirmed" },
-              "restrictions": []
+              "consistency": {
+                "type": "none"
+              },
+              "restrictions": [
+                "inactivity_60d"
+              ]
             }
-          ],
-          "notes": ["Plan exists and the 10% single-phase target was observed. Loss limits not confirmed."]
+          ]
         },
         {
+          "plan_id": "fundednext_stellar_lite",
           "plan_name": "Stellar Lite",
-          "verified": false,
-          "verified_date": "2026-07-16",
-          "source": "fundednext.com (plan lineup observed)",
-          "account_sizes_usd": null,
+          "market": "forex",
+          "verified": true,
+          "rules_verified": "2026-07-16",
+          "account_sizes_usd": [
+            10000,
+            25000,
+            50000,
+            100000,
+            200000
+          ],
+          "notes": [
+            "Account sizes are not yet re-verified for the Stellar lineup — the list below is a placeholder inherited from the prior preset; confirm at fundednext.com.",
+            "Daily loss includes unrealized (open-position) P&L and resets 00:00 server time — this app only tracks closed daily P&L, so a day with a large intraday open-position drawdown that closed back out won't be reflected here.",
+            "This is the CFD line; FundedNext's separate Futures plans (Flex/Legacy/Rapid) are not covered by this preset."
+          ],
           "phases": [
             {
-              "phase": 1,
-              "phase_name": "Phase 1",
-              "profit_target": { "unit": "pct_of_initial", "value": 8 },
-              "daily_loss": { "type": "unconfirmed" },
-              "max_drawdown": { "type": "unconfirmed" },
-              "min_trading_days": null,
+              "profit_target_pct": 8,
+              "daily_loss": {
+                "type": "pct_initial",
+                "value": 4
+              },
+              "max_drawdown": {
+                "type": "static",
+                "value": 8,
+                "locks_at": "none"
+              },
+              "min_trading_days": 5,
               "time_limit_days": null,
-              "consistency": { "type": "unconfirmed" },
-              "restrictions": []
+              "consistency": {
+                "type": "none"
+              },
+              "restrictions": [
+                "inactivity_60d"
+              ]
             },
             {
-              "phase": 2,
-              "phase_name": "Phase 2",
-              "profit_target": { "unit": "pct_of_initial", "value": 4 },
-              "daily_loss": { "type": "unconfirmed" },
-              "max_drawdown": { "type": "unconfirmed" },
-              "min_trading_days": null,
+              "profit_target_pct": 4,
+              "daily_loss": {
+                "type": "pct_initial",
+                "value": 4
+              },
+              "max_drawdown": {
+                "type": "static",
+                "value": 8,
+                "locks_at": "none"
+              },
+              "min_trading_days": 5,
               "time_limit_days": null,
-              "consistency": { "type": "unconfirmed" },
-              "restrictions": []
+              "consistency": {
+                "type": "none"
+              },
+              "restrictions": [
+                "inactivity_60d"
+              ]
             }
+          ]
+        },
+        {
+          "plan_id": "fundednext_stellar_instant",
+          "plan_name": "Stellar Instant",
+          "market": "forex",
+          "verified": true,
+          "rules_verified": "2026-07-16",
+          "account_sizes_usd": [
+            10000,
+            25000,
+            50000,
+            100000,
+            200000
           ],
-          "notes": []
+          "notes": [
+            "Account sizes are not yet re-verified for the Stellar lineup — the list below is a placeholder inherited from the prior preset; confirm at fundednext.com.",
+            "This is the CFD line; FundedNext's separate Futures plans (Flex/Legacy/Rapid) are not covered by this preset."
+          ],
+          "phases": [
+            {
+              "profit_target_pct": 0,
+              "daily_loss": {
+                "type": "none"
+              },
+              "max_drawdown": {
+                "type": "eod_trail",
+                "value": 6,
+                "locks_at": "start_balance"
+              },
+              "min_trading_days": 0,
+              "time_limit_days": null,
+              "consistency": {
+                "type": "none"
+              },
+              "restrictions": [
+                "inactivity_60d"
+              ]
+            }
+          ]
         }
       ]
     },
     {
       "firm": "FundingPips",
-      "asset_classes": ["forex", "cfd"],
+      "asset_classes": [
+        "forex",
+        "cfd"
+      ],
       "plans": [
         {
-          "plan_name": "2-Step",
+          "plan_id": "fundingpips_1step",
+          "plan_name": "1 Step",
+          "market": "forex",
           "verified": true,
-          "verified_date": "2026-07-16",
-          "source": "fundingpips.com",
-          "account_sizes_usd": null,
+          "rules_verified": "2026-07-16",
+          "account_sizes_usd": [
+            5000,
+            10000,
+            25000,
+            50000,
+            100000
+          ],
+          "notes": [
+            "Max drawdown type (static vs trailing) is assumed static pending confirmation at fundingpips.com."
+          ],
           "phases": [
             {
-              "phase": 1,
-              "phase_name": "Phase 1",
-              "profit_target": { "unit": "pct_of_initial", "value": 8 },
-              "daily_loss": { "type": "pct_initial", "value_pct": 5, "failing": true, "confidence": "varies_by_plan" },
-              "max_drawdown": { "type": "static", "value_pct": 10, "locks_at": null },
-              "min_trading_days": 0,
+              "profit_target_pct": 10,
+              "daily_loss": {
+                "type": "pct_initial",
+                "value": 3
+              },
+              "max_drawdown": {
+                "type": "static",
+                "value": 6,
+                "locks_at": "none"
+              },
+              "min_trading_days": 3,
               "time_limit_days": null,
-              "consistency": { "type": "unconfirmed" },
+              "consistency": {
+                "type": "none"
+              },
+              "restrictions": []
+            }
+          ]
+        },
+        {
+          "plan_id": "fundingpips_2step_standard",
+          "plan_name": "2 Step Standard",
+          "market": "forex",
+          "verified": true,
+          "rules_verified": "2026-07-16",
+          "account_sizes_usd": [
+            5000,
+            10000,
+            25000,
+            50000,
+            100000
+          ],
+          "notes": [
+            "Max drawdown type (static vs trailing) is assumed static pending confirmation at fundingpips.com."
+          ],
+          "phases": [
+            {
+              "profit_target_pct": 8,
+              "daily_loss": {
+                "type": "pct_initial",
+                "value": 5
+              },
+              "max_drawdown": {
+                "type": "static",
+                "value": 10,
+                "locks_at": "none"
+              },
+              "min_trading_days": 3,
+              "time_limit_days": null,
+              "consistency": {
+                "type": "none"
+              },
               "restrictions": []
             },
             {
-              "phase": 2,
-              "phase_name": "Phase 2",
-              "profit_target": { "unit": "pct_of_initial", "value": 5 },
-              "daily_loss": { "type": "pct_initial", "value_pct": 5, "failing": true, "confidence": "varies_by_plan" },
-              "max_drawdown": { "type": "static", "value_pct": 10, "locks_at": null },
-              "min_trading_days": 0,
+              "profit_target_pct": 5,
+              "daily_loss": {
+                "type": "pct_initial",
+                "value": 5
+              },
+              "max_drawdown": {
+                "type": "static",
+                "value": 10,
+                "locks_at": "none"
+              },
+              "min_trading_days": 3,
               "time_limit_days": null,
-              "consistency": { "type": "unconfirmed" },
+              "consistency": {
+                "type": "none"
+              },
               "restrictions": []
             }
+          ]
+        },
+        {
+          "plan_id": "fundingpips_2step_flex",
+          "plan_name": "2 Step Flex",
+          "market": "forex",
+          "verified": true,
+          "rules_verified": "2026-07-16",
+          "account_sizes_usd": [
+            5000,
+            10000,
+            25000,
+            50000,
+            100000
           ],
           "notes": [
-            "Phase 2 target is 5%, not 10%. Several third-party comparison sites list 10% and are wrong.",
-            "Daily loss varies between 3% and 5% depending on which of the five plans is purchased. Confirm per plan.",
-            "FundingPips runs five plans in total; only the 2-Step is encoded here."
+            "Max drawdown type (static vs trailing) is assumed static pending confirmation at fundingpips.com."
+          ],
+          "phases": [
+            {
+              "profit_target_pct": 10,
+              "daily_loss": {
+                "type": "pct_initial",
+                "value": 4
+              },
+              "max_drawdown": {
+                "type": "static",
+                "value": 12,
+                "locks_at": "none"
+              },
+              "min_trading_days": 0,
+              "time_limit_days": null,
+              "consistency": {
+                "type": "none"
+              },
+              "restrictions": []
+            },
+            {
+              "profit_target_pct": 6,
+              "daily_loss": {
+                "type": "pct_initial",
+                "value": 4
+              },
+              "max_drawdown": {
+                "type": "static",
+                "value": 12,
+                "locks_at": "none"
+              },
+              "min_trading_days": 0,
+              "time_limit_days": null,
+              "consistency": {
+                "type": "none"
+              },
+              "restrictions": []
+            }
+          ]
+        },
+        {
+          "plan_id": "fundingpips_2step_pro",
+          "plan_name": "2 Step Pro",
+          "market": "forex",
+          "verified": true,
+          "rules_verified": "2026-07-16",
+          "account_sizes_usd": [
+            5000,
+            10000,
+            25000,
+            50000,
+            100000,
+            200000
+          ],
+          "notes": [
+            "Max drawdown type (static vs trailing) is assumed static pending confirmation at fundingpips.com."
+          ],
+          "phases": [
+            {
+              "profit_target_pct": 6,
+              "daily_loss": {
+                "type": "pct_initial",
+                "value": 3
+              },
+              "max_drawdown": {
+                "type": "static",
+                "value": 6,
+                "locks_at": "none"
+              },
+              "min_trading_days": 1,
+              "time_limit_days": null,
+              "consistency": {
+                "type": "none"
+              },
+              "restrictions": []
+            },
+            {
+              "profit_target_pct": 6,
+              "daily_loss": {
+                "type": "pct_initial",
+                "value": 3
+              },
+              "max_drawdown": {
+                "type": "static",
+                "value": 6,
+                "locks_at": "none"
+              },
+              "min_trading_days": 1,
+              "time_limit_days": null,
+              "consistency": {
+                "type": "none"
+              },
+              "restrictions": []
+            }
+          ]
+        },
+        {
+          "plan_id": "fundingpips_zero",
+          "plan_name": "Zero",
+          "market": "forex",
+          "verified": true,
+          "rules_verified": "2026-07-16",
+          "account_sizes_usd": [
+            5000,
+            10000,
+            25000,
+            50000,
+            100000,
+            200000
+          ],
+          "notes": [
+            "Max drawdown type (static vs trailing) is assumed static pending confirmation at fundingpips.com.",
+            "Instant funded (no evaluation) — modeled as a single phase representing the funded stage directly. Biweekly payouts at a 95% split."
+          ],
+          "phases": [
+            {
+              "profit_target_pct": 0,
+              "daily_loss": {
+                "type": "pct_initial",
+                "value": 3
+              },
+              "max_drawdown": {
+                "type": "static",
+                "value": 5,
+                "locks_at": "none"
+              },
+              "min_trading_days": 0,
+              "min_profitable_days": 7,
+              "time_limit_days": null,
+              "consistency": {
+                "type": "best_day_pct_of_total",
+                "value": 15
+              },
+              "restrictions": []
+            }
           ]
         }
       ]
     },
     {
       "firm": "The5%ers",
-      "asset_classes": ["forex", "cfd"],
+      "asset_classes": [
+        "forex",
+        "cfd"
+      ],
       "plans": [
         {
-          "plan_name": "High Stakes",
+          "plan_id": "the5ers_1step",
+          "plan_name": "1-Step",
+          "market": "forex",
           "verified": true,
-          "verified_date": "2026-07-16",
-          "source": "the5ers.com",
-          "account_sizes_usd": null,
-          "phases": [
-            {
-              "phase": 1,
-              "phase_name": "Phase 1",
-              "profit_target": { "unit": "pct_of_initial", "value": 8 },
-              "daily_loss": { "type": "pct_initial", "value_pct": 3, "failing": true },
-              "max_drawdown": { "type": "static", "value_pct": 10, "locks_at": null },
-              "min_trading_days": 0,
-              "time_limit_days": null,
-              "consistency": { "type": "best_day_pct_of_total", "value_pct": 50, "applies_to": "all_stages_including_funded" },
-              "restrictions": ["no_weekend_holding"]
-            }
+          "rules_verified": "2026-07-16",
+          "account_sizes_usd": [
+            100000
           ],
           "notes": [
-            "Daily loss is 3%, not 5%. Widely misreported as 5% on comparison sites.",
-            "The 50%-per-day consistency rule continues to apply in the FUNDED stage, not just during evaluation. This is unusual and catches funded traders out.",
-            "Positions cannot be held over the weekend.",
-            "Scaling plan advertised up to $4M."
+            "Summer Plan lineup — promotional naming, recheck at the5ers.com after the promo period.",
+            "Max drawdown type (static vs trailing) is assumed static pending confirmation.",
+            "The 50% best-day consistency rule applies both during evaluation and on the funded stage.",
+            "Payout cap of $2,000 applies on early cycles; split is 75/25; max 2 active accounts per trader."
+          ],
+          "phases": [
+            {
+              "profit_target_pct": 10,
+              "daily_loss": {
+                "type": "pct_initial",
+                "value": 3
+              },
+              "max_drawdown": {
+                "type": "static",
+                "value": 6,
+                "locks_at": "none"
+              },
+              "min_trading_days": 0,
+              "time_limit_days": null,
+              "consistency": {
+                "type": "best_day_pct_of_total",
+                "value": 50
+              },
+              "restrictions": []
+            }
+          ]
+        },
+        {
+          "plan_id": "the5ers_2step_8_5",
+          "plan_name": "2-Step (8/5)",
+          "market": "forex",
+          "verified": true,
+          "rules_verified": "2026-07-16",
+          "account_sizes_usd": [
+            100000
+          ],
+          "notes": [
+            "Summer Plan lineup — promotional naming, recheck at the5ers.com after the promo period.",
+            "Max drawdown type (static vs trailing) is assumed static pending confirmation.",
+            "No consistency rule during evaluation, but the funded stage carries a 50% best-day consistency rule — not modeled here, this preset covers the evaluation phases only.",
+            "A 10%/5% target variant of this 2-step exists at checkout — this preset models the 8%/5% variant."
+          ],
+          "phases": [
+            {
+              "profit_target_pct": 8,
+              "daily_loss": {
+                "type": "pct_initial",
+                "value": 3
+              },
+              "max_drawdown": {
+                "type": "static",
+                "value": 10,
+                "locks_at": "none"
+              },
+              "min_trading_days": 1,
+              "time_limit_days": null,
+              "consistency": {
+                "type": "none"
+              },
+              "restrictions": []
+            },
+            {
+              "profit_target_pct": 5,
+              "daily_loss": {
+                "type": "pct_initial",
+                "value": 3
+              },
+              "max_drawdown": {
+                "type": "static",
+                "value": 10,
+                "locks_at": "none"
+              },
+              "min_trading_days": 1,
+              "time_limit_days": null,
+              "consistency": {
+                "type": "none"
+              },
+              "restrictions": []
+            }
           ]
         }
       ]
     },
     {
       "firm": "Breakout",
-      "asset_classes": ["crypto"],
+      "asset_classes": [
+        "crypto"
+      ],
       "owner": "Kraken",
       "plans": [
         {
+          "plan_id": "breakout_1step_classic",
           "plan_name": "1-Step Classic",
+          "market": "crypto",
           "verified": true,
-          "verified_date": "2026-07-15",
-          "source": "breakoutprop.com/program-rules",
-          "account_sizes_usd": [5000, 10000, 25000, 50000, 100000],
+          "rules_verified": "2026-07-15",
+          "account_sizes_usd": [
+            5000,
+            10000,
+            25000,
+            50000,
+            100000
+          ],
+          "notes": [],
           "phases": [
             {
-              "phase": 1,
-              "phase_name": "Evaluation",
-              "profit_target": { "unit": "pct_of_initial", "value": 10 },
-              "daily_loss": { "type": "pct_prior_day", "value_pct": 4, "failing": true, "measured_on": "equity_including_open_positions", "reset_time_utc": "00:30" },
-              "max_drawdown": { "type": "static", "value_pct": 6, "locks_at": null },
+              "profit_target_pct": 10,
+              "daily_loss": {
+                "type": "pct_prior_day",
+                "value": 4
+              },
+              "max_drawdown": {
+                "type": "static",
+                "value": 6,
+                "locks_at": "none"
+              },
               "min_trading_days": 0,
               "time_limit_days": null,
-              "consistency": { "type": "none" },
+              "consistency": {
+                "type": "none"
+              },
               "restrictions": []
             }
-          ],
-          "notes": ["Leverage 5:1 on BTC/ETH, 2:1 on altcoins. Weekend holding and news trading permitted. One evaluation at a time."]
+          ]
         },
         {
+          "plan_id": "breakout_1step_pro",
           "plan_name": "1-Step Pro",
+          "market": "crypto",
           "verified": true,
-          "verified_date": "2026-07-15",
-          "source": "breakoutprop.com/program-rules",
-          "account_sizes_usd": [5000, 10000, 25000, 50000, 100000, 200000],
+          "rules_verified": "2026-07-15",
+          "account_sizes_usd": [
+            5000,
+            10000,
+            25000,
+            50000,
+            100000,
+            200000
+          ],
+          "notes": [],
           "phases": [
             {
-              "phase": 1,
-              "phase_name": "Evaluation",
-              "profit_target": { "unit": "pct_of_initial", "value": 12 },
-              "daily_loss": { "type": "pct_prior_day", "value_pct": 3, "failing": true, "measured_on": "equity_including_open_positions", "reset_time_utc": "00:30" },
-              "max_drawdown": { "type": "static", "value_pct": 5, "locks_at": null },
+              "profit_target_pct": 12,
+              "daily_loss": {
+                "type": "pct_prior_day",
+                "value": 3
+              },
+              "max_drawdown": {
+                "type": "static",
+                "value": 5,
+                "locks_at": "none"
+              },
               "min_trading_days": 0,
               "time_limit_days": null,
-              "consistency": { "type": "none" },
+              "consistency": {
+                "type": "none"
+              },
               "restrictions": []
             }
-          ],
-          "notes": []
+          ]
         },
         {
+          "plan_id": "breakout_1step_turbo",
           "plan_name": "1-Step Turbo",
+          "market": "crypto",
           "verified": true,
-          "verified_date": "2026-07-15",
-          "source": "breakoutprop.com/program-rules",
-          "account_sizes_usd": [5000, 10000, 25000, 50000, 100000, 200000],
+          "rules_verified": "2026-07-15",
+          "account_sizes_usd": [
+            5000,
+            10000,
+            25000,
+            50000,
+            100000,
+            200000
+          ],
+          "notes": [],
           "phases": [
             {
-              "phase": 1,
-              "phase_name": "Evaluation",
-              "profit_target": { "unit": "pct_of_initial", "value": 9 },
-              "daily_loss": { "type": "pct_prior_day", "value_pct": 3, "failing": true, "measured_on": "equity_including_open_positions", "reset_time_utc": "00:30" },
-              "max_drawdown": { "type": "static", "value_pct": 3, "locks_at": null },
+              "profit_target_pct": 9,
+              "daily_loss": {
+                "type": "pct_prior_day",
+                "value": 3
+              },
+              "max_drawdown": {
+                "type": "static",
+                "value": 3,
+                "locks_at": "none"
+              },
               "min_trading_days": 0,
               "time_limit_days": null,
-              "consistency": { "type": "none" },
+              "consistency": {
+                "type": "none"
+              },
               "restrictions": []
             }
-          ],
-          "notes": ["3% static max drawdown is very tight. A 9% target against a 3% buffer requires a high win rate or small size."]
+          ]
         },
         {
+          "plan_id": "breakout_2step",
           "plan_name": "2-Step",
+          "market": "crypto",
           "verified": true,
-          "verified_date": "2026-07-15",
-          "source": "breakoutprop.com/program-rules",
-          "account_sizes_usd": [5000, 10000, 25000, 50000, 100000],
+          "rules_verified": "2026-07-15",
+          "account_sizes_usd": [
+            5000,
+            10000,
+            25000,
+            50000,
+            100000
+          ],
+          "notes": [
+            "Source doc's official example (HWM 105K → floor 97K) confirms the 8% trailing floor caps AT starting balance once earned, matching the engine's locks_at: start_balance mechanic (same one TopStep uses) rather than trailing forever."
+          ],
           "phases": [
             {
-              "phase": 1,
-              "phase_name": "Phase 1",
-              "profit_target": { "unit": "pct_of_initial", "value": 5 },
-              "daily_loss": { "type": "pct_prior_day", "value_pct": 5, "failing": true, "measured_on": "equity_including_open_positions", "reset_time_utc": "00:30" },
-              "max_drawdown": { "type": "trailing_high_water_mark", "value_pct": 8, "locks_at": "start_balance" },
+              "profit_target_pct": 5,
+              "daily_loss": {
+                "type": "pct_prior_day",
+                "value": 5
+              },
+              "max_drawdown": {
+                "type": "eod_trail",
+                "value": 8,
+                "locks_at": "start_balance"
+              },
               "min_trading_days": 0,
               "time_limit_days": null,
-              "consistency": { "type": "none" },
+              "consistency": {
+                "type": "none"
+              },
               "restrictions": []
             },
             {
-              "phase": 2,
-              "phase_name": "Phase 2",
-              "profit_target": { "unit": "pct_of_initial", "value": 10 },
-              "daily_loss": { "type": "pct_prior_day", "value_pct": 5, "failing": true, "measured_on": "equity_including_open_positions", "reset_time_utc": "00:30" },
-              "max_drawdown": { "type": "trailing_high_water_mark", "value_pct": 8, "locks_at": "start_balance" },
+              "profit_target_pct": 10,
+              "daily_loss": {
+                "type": "pct_prior_day",
+                "value": 5
+              },
+              "max_drawdown": {
+                "type": "eod_trail",
+                "value": 8,
+                "locks_at": "start_balance"
+              },
               "min_trading_days": 0,
               "time_limit_days": null,
-              "consistency": { "type": "none" },
+              "consistency": {
+                "type": "none"
+              },
               "restrictions": []
             }
-          ],
-          "notes": [
-            "Balance resets at the start of each phase.",
-            "The 8% trailing drawdown follows the high water mark but will not trail past the starting balance. Official worked example: a HWM of 105,000 gives a floor of 97,000.",
-            "Fees 0.035% per side plus a 0.05% per day swap."
           ]
         }
       ]
     },
     {
       "firm": "HyroTrader",
-      "asset_classes": ["crypto"],
+      "asset_classes": [
+        "crypto"
+      ],
       "execution_venue": "Bybit",
       "plans": [
         {
-          "plan_name": "1-Step",
+          "plan_id": "hyrotrader_1step_standard",
+          "plan_name": "1-Step Standard",
+          "market": "crypto",
           "verified": true,
-          "verified_date": "2026-07-16",
-          "source": "hyrotrader.com",
-          "account_sizes_usd": null,
-          "phases": [
-            {
-              "phase": 1,
-              "phase_name": "Evaluation",
-              "profit_target": { "unit": "unconfirmed" },
-              "daily_loss": { "type": "trailing_daily", "value_pct": 4, "failing": true },
-              "max_drawdown": { "type": "static", "value_pct": 6, "locks_at": null },
-              "min_trading_days": 10,
-              "time_limit_days": null,
-              "consistency": { "type": "best_trade_pct_of_total", "value_pct": 40 },
-              "restrictions": ["mandatory_stop_loss_within_5_minutes"]
-            }
+          "rules_verified": "2026-07-16",
+          "account_sizes_usd": [
+            5000,
+            10000,
+            25000,
+            50000,
+            100000,
+            200000
           ],
           "notes": [
-            "The consistency rule is measured per TRADE, not per day. No single trade may exceed 40% of total profit during the evaluation. Most trackers cannot compute this from daily balance entries alone.",
-            "Daily loss is TRAILING rather than fixed, which is unusual.",
-            "Every position must have a stop loss set within 5 minutes of entry.",
-            "Leverage up to 100:1 across 700+ pairs. Profit split starts at 70%.",
-            "Rules changed materially between April and July 2026 — earlier third-party data on this firm is unreliable."
+            "A \"qualifying\" trading day per HyroTrader's own rules requires a trade ≥5% of initial balance with PnL beyond ±1% — this app counts any logged day as a trading day, which is looser than that official definition.",
+            "Overall max loss (6%) is encoded as static — the official rules table doesn't indicate whether it trails."
+          ],
+          "phases": [
+            {
+              "profit_target_pct": 10,
+              "daily_loss": {
+                "type": "trailing_intraday_high",
+                "value": 4
+              },
+              "max_drawdown": {
+                "type": "static",
+                "value": 6,
+                "locks_at": "none"
+              },
+              "min_trading_days": 5,
+              "time_limit_days": null,
+              "consistency": {
+                "type": "best_day_pct_of_total",
+                "value": 40
+              },
+              "restrictions": [
+                "max_loss_per_trade_3pct",
+                "no_martingale",
+                "no_cross_account_hedging",
+                "lowcap_exposure_5pct"
+              ]
+            }
           ]
         },
         {
-          "plan_name": "2-Step",
+          "plan_id": "hyrotrader_1step_swing",
+          "plan_name": "1-Step Swing",
+          "market": "crypto",
           "verified": true,
-          "verified_date": "2026-07-16",
-          "source": "hyrotrader.com",
-          "account_sizes_usd": null,
+          "rules_verified": "2026-07-16",
+          "account_sizes_usd": [
+            5000,
+            10000,
+            25000,
+            50000,
+            100000,
+            200000
+          ],
+          "notes": [
+            "A \"qualifying\" trading day per HyroTrader's own rules requires a trade ≥5% of initial balance with PnL beyond ±1% — this app counts any logged day as a trading day, which is looser than that official definition.",
+            "Overall max loss (6%) is encoded as static — the official rules table doesn't indicate whether it trails."
+          ],
           "phases": [
             {
-              "phase": 1,
-              "phase_name": "Evaluation",
-              "profit_target": { "unit": "unconfirmed" },
-              "daily_loss": { "type": "trailing_daily", "value_pct": 4, "failing": true },
-              "max_drawdown": { "type": "static", "value_pct": 6, "locks_at": null },
-              "min_trading_days": 15,
+              "profit_target_pct": 10,
+              "daily_loss": {
+                "type": "pct_prior_day",
+                "value": 4
+              },
+              "max_drawdown": {
+                "type": "static",
+                "value": 6,
+                "locks_at": "none"
+              },
+              "min_trading_days": 5,
               "time_limit_days": null,
-              "consistency": { "type": "best_trade_pct_of_total", "value_pct": 40 },
-              "restrictions": ["mandatory_stop_loss_within_5_minutes"]
+              "consistency": {
+                "type": "best_day_pct_of_total",
+                "value": 40
+              },
+              "restrictions": [
+                "max_loss_per_trade_3pct",
+                "no_martingale",
+                "no_cross_account_hedging",
+                "lowcap_exposure_5pct"
+              ]
             }
+          ]
+        },
+        {
+          "plan_id": "hyrotrader_2step_standard",
+          "plan_name": "2-Step Standard",
+          "market": "crypto",
+          "verified": true,
+          "rules_verified": "2026-07-16",
+          "account_sizes_usd": [
+            5000,
+            10000,
+            25000,
+            50000,
+            100000,
+            200000
           ],
-          "notes": ["Minimum 15 trading days on the 2-step versus 10 on the 1-step."]
+          "notes": [
+            "A \"qualifying\" trading day per HyroTrader's own rules requires a trade ≥5% of initial balance with PnL beyond ±1% — this app counts any logged day as a trading day, which is looser than that official definition.",
+            "Overall max loss (10%) is encoded as static — the official rules table doesn't indicate whether it trails."
+          ],
+          "phases": [
+            {
+              "profit_target_pct": 10,
+              "daily_loss": {
+                "type": "trailing_intraday_high",
+                "value": 5
+              },
+              "max_drawdown": {
+                "type": "static",
+                "value": 10,
+                "locks_at": "none"
+              },
+              "min_trading_days": 5,
+              "time_limit_days": null,
+              "consistency": {
+                "type": "best_day_pct_of_total",
+                "value": 40
+              },
+              "restrictions": [
+                "max_loss_per_trade_3pct",
+                "no_martingale",
+                "no_cross_account_hedging",
+                "lowcap_exposure_5pct"
+              ]
+            },
+            {
+              "profit_target_pct": 5,
+              "daily_loss": {
+                "type": "trailing_intraday_high",
+                "value": 5
+              },
+              "max_drawdown": {
+                "type": "static",
+                "value": 10,
+                "locks_at": "none"
+              },
+              "min_trading_days": 5,
+              "time_limit_days": null,
+              "consistency": {
+                "type": "best_day_pct_of_total",
+                "value": 40
+              },
+              "restrictions": [
+                "max_loss_per_trade_3pct",
+                "no_martingale",
+                "no_cross_account_hedging",
+                "lowcap_exposure_5pct"
+              ]
+            }
+          ]
+        },
+        {
+          "plan_id": "hyrotrader_2step_swing",
+          "plan_name": "2-Step Swing",
+          "market": "crypto",
+          "verified": true,
+          "rules_verified": "2026-07-16",
+          "account_sizes_usd": [
+            5000,
+            10000,
+            25000,
+            50000,
+            100000,
+            200000
+          ],
+          "notes": [
+            "A \"qualifying\" trading day per HyroTrader's own rules requires a trade ≥5% of initial balance with PnL beyond ±1% — this app counts any logged day as a trading day, which is looser than that official definition.",
+            "Overall max loss (10%) is encoded as static — the official rules table doesn't indicate whether it trails."
+          ],
+          "phases": [
+            {
+              "profit_target_pct": 10,
+              "daily_loss": {
+                "type": "pct_prior_day",
+                "value": 5
+              },
+              "max_drawdown": {
+                "type": "static",
+                "value": 10,
+                "locks_at": "none"
+              },
+              "min_trading_days": 5,
+              "time_limit_days": null,
+              "consistency": {
+                "type": "best_day_pct_of_total",
+                "value": 40
+              },
+              "restrictions": [
+                "max_loss_per_trade_3pct",
+                "no_martingale",
+                "no_cross_account_hedging",
+                "lowcap_exposure_5pct"
+              ]
+            },
+            {
+              "profit_target_pct": 5,
+              "daily_loss": {
+                "type": "pct_prior_day",
+                "value": 5
+              },
+              "max_drawdown": {
+                "type": "static",
+                "value": 10,
+                "locks_at": "none"
+              },
+              "min_trading_days": 5,
+              "time_limit_days": null,
+              "consistency": {
+                "type": "best_day_pct_of_total",
+                "value": 40
+              },
+              "restrictions": [
+                "max_loss_per_trade_3pct",
+                "no_martingale",
+                "no_cross_account_hedging",
+                "lowcap_exposure_5pct"
+              ]
+            }
+          ]
         }
       ]
     },
     {
       "firm": "Bitfunded",
-      "asset_classes": ["crypto"],
+      "asset_classes": [
+        "crypto"
+      ],
       "plans": [
         {
+          "plan_id": "bitfunded_2step",
           "plan_name": "2-Step",
+          "market": "crypto",
           "verified": true,
-          "verified_date": "2026-07-23",
-          "source": "bitfunded.com",
-          "account_sizes_usd": [5000, 10000, 15000, 25000, 50000, 100000],
-          "phases": [
-            {
-              "phase": 1,
-              "phase_name": "Phase 1",
-              "profit_target": { "unit": "pct_of_initial", "value": 8 },
-              "daily_loss": { "type": "pct_initial", "value_pct": 5, "failing": true },
-              "max_drawdown": { "type": "static", "value_pct": 10, "locks_at": null, "confidence": "assumed_static" },
-              "min_trading_days": 0,
-              "time_limit_days": null,
-              "consistency": { "type": "none" },
-              "restrictions": ["all_positions_closed_to_advance_stage"]
-            },
-            {
-              "phase": 2,
-              "phase_name": "Phase 2",
-              "profit_target": { "unit": "pct_of_initial", "value": 5 },
-              "daily_loss": { "type": "pct_initial", "value_pct": 5, "failing": true },
-              "max_drawdown": { "type": "static", "value_pct": 8, "locks_at": null, "confidence": "assumed_static" },
-              "min_trading_days": 0,
-              "time_limit_days": null,
-              "consistency": { "type": "none" },
-              "restrictions": ["all_positions_closed_to_advance_stage"]
-            },
-            {
-              "phase": 3,
-              "phase_name": "Trader Stage (funded)",
-              "profit_target": { "unit": "none" },
-              "daily_loss": { "type": "pct_initial", "value_pct": 5, "failing": true },
-              "max_drawdown": { "type": "static", "value_pct": 8, "locks_at": null, "confidence": "assumed_static" },
-              "min_trading_days": 0,
-              "time_limit_days": null,
-              "consistency": { "type": "none" },
-              "restrictions": []
-            }
+          "rules_verified": "2026-07-23",
+          "account_sizes_usd": [
+            5000,
+            10000,
+            15000,
+            25000,
+            50000,
+            100000
           ],
           "notes": [
-            "Max leverage 1:5 on all plans. Unlimited trading period.",
-            "The published tables do not state whether max loss is static or trailing. Static is assumed; treat as unconfirmed."
+            "Max drawdown type (static vs trailing) is not stated on Bitfunded's plan tables — encoded as static pending confirmation (tooltip-level gap).",
+            "Funded (Trader Stage) — daily 5%, max 8% — mirrors this preset's Phase 2 limits exactly; not modeled as a separate phase, this preset covers the 2-step evaluation only."
+          ],
+          "phases": [
+            {
+              "profit_target_pct": 8,
+              "daily_loss": {
+                "type": "pct_initial",
+                "value": 5
+              },
+              "max_drawdown": {
+                "type": "static",
+                "value": 10,
+                "locks_at": "none"
+              },
+              "min_trading_days": 0,
+              "time_limit_days": null,
+              "consistency": {
+                "type": "none"
+              },
+              "restrictions": []
+            },
+            {
+              "profit_target_pct": 5,
+              "daily_loss": {
+                "type": "pct_initial",
+                "value": 5
+              },
+              "max_drawdown": {
+                "type": "static",
+                "value": 8,
+                "locks_at": "none"
+              },
+              "min_trading_days": 0,
+              "time_limit_days": null,
+              "consistency": {
+                "type": "none"
+              },
+              "restrictions": []
+            }
           ]
         },
         {
+          "plan_id": "bitfunded_1step",
           "plan_name": "1-Step",
+          "market": "crypto",
           "verified": true,
-          "verified_date": "2026-07-23",
-          "source": "bitfunded.com",
-          "account_sizes_usd": [5000, 10000, 15000, 25000, 50000, 100000, 150000],
+          "rules_verified": "2026-07-23",
+          "account_sizes_usd": [
+            5000,
+            10000,
+            15000,
+            25000,
+            50000,
+            100000,
+            150000
+          ],
+          "notes": [
+            "Max drawdown type (static vs trailing) is not stated on Bitfunded's plan tables — encoded as static pending confirmation (tooltip-level gap).",
+            "Funded stage — daily 4%, max 6% — mirrors this preset's evaluation limits exactly; not modeled as a separate phase, this preset covers the 1-step evaluation only."
+          ],
           "phases": [
             {
-              "phase": 1,
-              "phase_name": "Evaluation",
-              "profit_target": { "unit": "pct_of_initial", "value": 10 },
-              "daily_loss": { "type": "pct_initial", "value_pct": 4, "failing": true },
-              "max_drawdown": { "type": "static", "value_pct": 6, "locks_at": null, "confidence": "assumed_static" },
+              "profit_target_pct": 10,
+              "daily_loss": {
+                "type": "pct_initial",
+                "value": 4
+              },
+              "max_drawdown": {
+                "type": "static",
+                "value": 6,
+                "locks_at": "none"
+              },
               "min_trading_days": 0,
               "time_limit_days": null,
-              "consistency": { "type": "none" },
-              "restrictions": ["all_positions_closed_to_advance_stage"]
-            },
-            {
-              "phase": 2,
-              "phase_name": "Trader Stage (funded)",
-              "profit_target": { "unit": "none" },
-              "daily_loss": { "type": "pct_initial", "value_pct": 4, "failing": true },
-              "max_drawdown": { "type": "static", "value_pct": 6, "locks_at": null, "confidence": "assumed_static" },
-              "min_trading_days": 0,
-              "time_limit_days": null,
-              "consistency": { "type": "none" },
+              "consistency": {
+                "type": "none"
+              },
               "restrictions": []
             }
-          ],
-          "notes": ["The 150,000 size is marketed as the 'Apex' account on this plan."]
+          ]
         },
         {
+          "plan_id": "bitfunded_instant",
           "plan_name": "Instant",
+          "market": "crypto",
           "verified": true,
-          "verified_date": "2026-07-23",
-          "source": "bitfunded.com",
-          "account_sizes_usd": [2500, 5000],
+          "rules_verified": "2026-07-23",
+          "account_sizes_usd": [
+            2500,
+            5000
+          ],
+          "notes": [
+            "Max drawdown type (static vs trailing) is not stated on Bitfunded's plan tables — encoded as static pending confirmation (tooltip-level gap).",
+            "No evaluation — funded (Trader Stage) from day one, 60% profit share (not modeled by the engine, informational only). Modeled as a single phase representing the funded stage directly."
+          ],
           "phases": [
             {
-              "phase": 1,
-              "phase_name": "Trader Stage (funded)",
-              "profit_target": { "unit": "none" },
-              "daily_loss": { "type": "pct_initial", "value_pct": 3, "failing": true },
-              "max_drawdown": { "type": "static", "value_pct": 6, "locks_at": null, "confidence": "assumed_static" },
+              "profit_target_pct": 0,
+              "daily_loss": {
+                "type": "pct_initial",
+                "value": 3
+              },
+              "max_drawdown": {
+                "type": "static",
+                "value": 6,
+                "locks_at": "none"
+              },
               "min_trading_days": 0,
               "time_limit_days": null,
-              "consistency": { "type": "none" },
+              "consistency": {
+                "type": "none"
+              },
               "restrictions": []
             }
-          ],
-          "notes": ["No evaluation phase. Profit share 60%, lower than the challenge plans."]
+          ]
         }
+      ]
+    }
+  ],
+  "research_only": [
+    {
+      "firm": "MyFundedFutures",
+      "asset_classes": [
+        "futures"
+      ],
+      "provenance": "Researched 2026-07-11 from help.myfundedfutures.com. Not encoded in the FuturesEdge rules engine, so these figures have not been through the engine test suite.",
+      "key_facts": [
+        "No daily loss limit on ANY plan. This is the firm's main structural differentiator.",
+        "Targets approximately 6% across sizes: 50K to $3,000, 100K to $6,000, 150K to $9,000.",
+        "Core: 6% target, 3% end-of-day trailing drawdown, 50% best-day consistency rule during evaluation only.",
+        "Rapid: 4% intraday trailing drawdown, no consistency rule.",
+        "Pro: 3% end-of-day trailing drawdown, no consistency rule.",
+        "Flex: 4% end-of-day fixed buffer, no consistency rule.",
+        "Builder ($50K only): buffer of $2,000 or $1,500 chosen at checkout, target $3,000, no consistency rule. Two traders on the same named plan can therefore have different limits."
       ]
     },
     {
       "firm": "Crypto Fund Trader",
-      "asset_classes": ["crypto"],
+      "asset_classes": [
+        "crypto"
+      ],
       "platform": "MT5",
-      "plans": [
-        {
-          "plan_name": "Standard",
-          "verified": false,
-          "verified_date": null,
-          "source": "secondary sources only",
-          "account_sizes_usd": null,
-          "phases": [
-            {
-              "phase": 1,
-              "phase_name": "Evaluation",
-              "profit_target": { "unit": "unconfirmed" },
-              "daily_loss": { "type": "unconfirmed" },
-              "max_drawdown": { "type": "unconfirmed" },
-              "min_trading_days": null,
-              "time_limit_days": null,
-              "consistency": { "type": "unconfirmed" },
-              "restrictions": ["daily_profit_cap_10000_usd", "per_trade_profit_cap_10000_usd"]
-            }
-          ],
-          "notes": [
-            "Unusual structure: profit CAPS rather than only loss limits. $10,000 maximum daily profit and $10,000 maximum per-trade profit, described by the firm as anti-gambling measures.",
-            "Operating since November 2022, the oldest crypto prop firm. 715+ pairs, up to $300K single account, 80–90% profit split.",
-            "Targets and drawdown limits NOT confirmed. Do not rely on this entry for trading decisions."
-          ]
-        }
+      "provenance": "Secondary sources only. NOT verified against the firm. Do not rely on this entry for trading decisions.",
+      "key_facts": [
+        "Unusual structure: profit CAPS rather than only loss limits. $10,000 maximum daily profit and $10,000 maximum per-trade profit, described by the firm as anti-gambling measures.",
+        "Operating since November 2022, the oldest crypto prop firm. 715+ pairs, up to $300K single account, 80-90% profit split.",
+        "Profit targets and drawdown limits NOT confirmed."
       ]
     },
     {
       "firm": "Tradeify Crypto",
-      "asset_classes": ["crypto"],
-      "plans": [
-        {
-          "plan_name": "Standard",
-          "verified": false,
-          "verified_date": null,
-          "source": "secondary sources only",
-          "account_sizes_usd": null,
-          "phases": [
-            {
-              "phase": 1,
-              "phase_name": "Evaluation",
-              "profit_target": { "unit": "unconfirmed" },
-              "daily_loss": { "type": "eod", "value_pct": null },
-              "max_drawdown": { "type": "unconfirmed" },
-              "min_trading_days": null,
-              "time_limit_days": null,
-              "consistency": { "type": "unconfirmed" },
-              "restrictions": []
-            }
-          ],
-          "notes": [
-            "Launched February 2026. Parent company Tradeify Futures reports $125M+ paid out, but the crypto arm has no payout history yet.",
-            "End-of-day daily loss calculation. Instant funding option available. $600K aggregate cap, $100K maximum single account, flat 80% split.",
-            "Exact rule values NOT confirmed."
-          ]
-        }
+      "asset_classes": [
+        "crypto"
+      ],
+      "provenance": "Secondary sources only. NOT verified against the firm.",
+      "key_facts": [
+        "Launched February 2026. Parent company Tradeify Futures reports $125M+ paid out, but the crypto arm has no payout history yet.",
+        "End-of-day daily loss calculation. Instant funding option available. $600K aggregate cap, $100K maximum single account, flat 80% split.",
+        "Exact rule values NOT confirmed."
       ]
     }
   ],
@@ -826,7 +1597,7 @@
     {
       "firm": "MyFundedFX",
       "status": "collapsed",
-      "note": "Included as a record only. Do not fund an account here."
+      "note": "Recorded so nobody funds an account here."
     }
   ]
 }
