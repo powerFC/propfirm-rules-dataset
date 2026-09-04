@@ -1,7 +1,7 @@
 {
   "schema_version": "2.0",
   "dataset_name": "Prop Firm Rules Dataset",
-  "last_updated": "2026-08-12",
+  "last_updated": "2026-09-04",
   "maintainer": "FuturesEdge",
   "homepage": "https://futuresedgetrade.app",
   "license": "CC-BY-4.0",
@@ -26,7 +26,7 @@
           "plan_name": "2-Step Evaluation",
           "market": "forex",
           "verified": true,
-          "rules_verified": "2026-07-16",
+          "rules_verified": "2026-08-29",
           "account_sizes_usd": [
             10000,
             25000,
@@ -34,7 +34,9 @@
             100000,
             200000
           ],
-          "notes": [],
+          "notes": [
+            "CORRECTED 2026-08-29 (was static, under-warning bug): FTMO's own Trading Objectives state the Maximum Loss Limit \"is recalculated daily at 00:00 CE(S)T as the difference between the highest account balance achieved at 00:00 of any preceding trading day, or if higher the Initial Simulated Capital... The limit can only increase, but never decrease\" and \"applies to both phases of the FTMO Challenge\". Encoded as eod_trail, matching our own FTMO 1-Step preset. Source: FTMO Trading Objectives (own docs)."
+          ],
           "phases": [
             {
               "profit_target_pct": 10,
@@ -43,7 +45,7 @@
                 "value": 5
               },
               "max_drawdown": {
-                "type": "static",
+                "type": "eod_trail",
                 "value": 10,
                 "locks_at": "none"
               },
@@ -61,7 +63,7 @@
                 "value": 5
               },
               "max_drawdown": {
-                "type": "static",
+                "type": "eod_trail",
                 "value": 10,
                 "locks_at": "none"
               },
@@ -449,7 +451,7 @@
           "plan_name": "Stellar 2-Step",
           "market": "forex",
           "verified": true,
-          "rules_verified": "2026-07-16",
+          "rules_verified": "2026-08-29",
           "account_sizes_usd": [
             10000,
             25000,
@@ -460,7 +462,8 @@
           "notes": [
             "Account sizes are not yet re-verified for the Stellar lineup — the list below is a placeholder inherited from the prior preset; confirm at fundednext.com.",
             "Daily loss includes unrealized (open-position) P&L and resets 00:00 server time — this app only tracks closed daily P&L, so a day with a large intraday open-position drawdown that closed back out won't be reflected here.",
-            "This is the CFD line; FundedNext's separate Futures plans (Flex/Legacy/Rapid) are not covered by this preset."
+            "This is the CFD line; FundedNext's separate Futures plans (Flex/Legacy/Rapid) are not covered by this preset.",
+            "CHECKED 2026-08-29: FundedNext does not publish its daily-loss basis (initial vs prior-day) — it calls this \"Today's Permitted Loss Limit\", which implies daily recalculation but doesn't state which. Left as pct_initial pending confirmation; do not treat this as verified."
           ],
           "phases": [
             {
@@ -510,7 +513,7 @@
           "plan_name": "Stellar 1-Step",
           "market": "forex",
           "verified": true,
-          "rules_verified": "2026-07-16",
+          "rules_verified": "2026-08-29",
           "account_sizes_usd": [
             10000,
             25000,
@@ -521,7 +524,8 @@
           "notes": [
             "Account sizes are not yet re-verified for the Stellar lineup — the list below is a placeholder inherited from the prior preset; confirm at fundednext.com.",
             "Daily loss includes unrealized (open-position) P&L and resets 00:00 server time — this app only tracks closed daily P&L, so a day with a large intraday open-position drawdown that closed back out won't be reflected here.",
-            "This is the CFD line; FundedNext's separate Futures plans (Flex/Legacy/Rapid) are not covered by this preset."
+            "This is the CFD line; FundedNext's separate Futures plans (Flex/Legacy/Rapid) are not covered by this preset.",
+            "CHECKED 2026-08-29: FundedNext does not publish its daily-loss basis (initial vs prior-day) — it calls this \"Today's Permitted Loss Limit\", which implies daily recalculation but doesn't state which. Left as pct_initial pending confirmation; do not treat this as verified."
           ],
           "phases": [
             {
@@ -551,7 +555,7 @@
           "plan_name": "Stellar Lite",
           "market": "forex",
           "verified": true,
-          "rules_verified": "2026-07-16",
+          "rules_verified": "2026-08-29",
           "account_sizes_usd": [
             10000,
             25000,
@@ -562,7 +566,8 @@
           "notes": [
             "Account sizes are not yet re-verified for the Stellar lineup — the list below is a placeholder inherited from the prior preset; confirm at fundednext.com.",
             "Daily loss includes unrealized (open-position) P&L and resets 00:00 server time — this app only tracks closed daily P&L, so a day with a large intraday open-position drawdown that closed back out won't be reflected here.",
-            "This is the CFD line; FundedNext's separate Futures plans (Flex/Legacy/Rapid) are not covered by this preset."
+            "This is the CFD line; FundedNext's separate Futures plans (Flex/Legacy/Rapid) are not covered by this preset.",
+            "CHECKED 2026-08-29: FundedNext does not publish its daily-loss basis (initial vs prior-day) — it calls this \"Today's Permitted Loss Limit\", which implies daily recalculation but doesn't state which. Left as pct_initial pending confirmation; do not treat this as verified."
           ],
           "phases": [
             {
@@ -660,7 +665,7 @@
           "plan_name": "1 Step",
           "market": "forex",
           "verified": true,
-          "rules_verified": "2026-07-16",
+          "rules_verified": "2026-08-29",
           "account_sizes_usd": [
             5000,
             10000,
@@ -669,13 +674,14 @@
             100000
           ],
           "notes": [
-            "Max drawdown type (static vs trailing) is assumed static pending confirmation at fundingpips.com."
+            "Max drawdown type (static vs trailing) is assumed static pending confirmation at fundingpips.com.",
+            "CORRECTED 2026-08-29: daily loss basis changed pct_initial -> pct_prior_day. FundingPips' own docs: \"3% of the higher value between your opening balance or opening equity for that day.\""
           ],
           "phases": [
             {
               "profit_target_pct": 10,
               "daily_loss": {
-                "type": "pct_initial",
+                "type": "pct_prior_day",
                 "value": 3
               },
               "max_drawdown": {
@@ -697,7 +703,7 @@
           "plan_name": "2 Step Standard",
           "market": "forex",
           "verified": true,
-          "rules_verified": "2026-07-16",
+          "rules_verified": "2026-08-29",
           "account_sizes_usd": [
             5000,
             10000,
@@ -706,13 +712,14 @@
             100000
           ],
           "notes": [
-            "Max drawdown type (static vs trailing) is assumed static pending confirmation at fundingpips.com."
+            "Max drawdown type (static vs trailing) is assumed static pending confirmation at fundingpips.com.",
+            "CORRECTED 2026-08-29: daily loss basis changed pct_initial -> pct_prior_day. FundingPips' own docs: \"3% of the higher value between your opening balance or opening equity for that day.\""
           ],
           "phases": [
             {
               "profit_target_pct": 8,
               "daily_loss": {
-                "type": "pct_initial",
+                "type": "pct_prior_day",
                 "value": 5
               },
               "max_drawdown": {
@@ -730,7 +737,7 @@
             {
               "profit_target_pct": 5,
               "daily_loss": {
-                "type": "pct_initial",
+                "type": "pct_prior_day",
                 "value": 5
               },
               "max_drawdown": {
@@ -752,7 +759,7 @@
           "plan_name": "2 Step Flex",
           "market": "forex",
           "verified": true,
-          "rules_verified": "2026-07-16",
+          "rules_verified": "2026-08-29",
           "account_sizes_usd": [
             5000,
             10000,
@@ -761,13 +768,14 @@
             100000
           ],
           "notes": [
-            "Max drawdown type (static vs trailing) is assumed static pending confirmation at fundingpips.com."
+            "Max drawdown type (static vs trailing) is assumed static pending confirmation at fundingpips.com.",
+            "CORRECTED 2026-08-29: daily loss basis changed pct_initial -> pct_prior_day. FundingPips' own docs: \"3% of the higher value between your opening balance or opening equity for that day.\""
           ],
           "phases": [
             {
               "profit_target_pct": 10,
               "daily_loss": {
-                "type": "pct_initial",
+                "type": "pct_prior_day",
                 "value": 4
               },
               "max_drawdown": {
@@ -785,7 +793,7 @@
             {
               "profit_target_pct": 6,
               "daily_loss": {
-                "type": "pct_initial",
+                "type": "pct_prior_day",
                 "value": 4
               },
               "max_drawdown": {
@@ -807,7 +815,7 @@
           "plan_name": "2 Step Pro",
           "market": "forex",
           "verified": true,
-          "rules_verified": "2026-07-16",
+          "rules_verified": "2026-08-29",
           "account_sizes_usd": [
             5000,
             10000,
@@ -817,13 +825,14 @@
             200000
           ],
           "notes": [
-            "Max drawdown type (static vs trailing) is assumed static pending confirmation at fundingpips.com."
+            "Max drawdown type (static vs trailing) is assumed static pending confirmation at fundingpips.com.",
+            "CORRECTED 2026-08-29: daily loss basis changed pct_initial -> pct_prior_day. FundingPips' own docs: \"3% of the higher value between your opening balance or opening equity for that day.\""
           ],
           "phases": [
             {
               "profit_target_pct": 6,
               "daily_loss": {
-                "type": "pct_initial",
+                "type": "pct_prior_day",
                 "value": 3
               },
               "max_drawdown": {
@@ -841,7 +850,7 @@
             {
               "profit_target_pct": 6,
               "daily_loss": {
-                "type": "pct_initial",
+                "type": "pct_prior_day",
                 "value": 3
               },
               "max_drawdown": {
@@ -863,7 +872,7 @@
           "plan_name": "Zero",
           "market": "forex",
           "verified": true,
-          "rules_verified": "2026-07-16",
+          "rules_verified": "2026-08-29",
           "account_sizes_usd": [
             5000,
             10000,
@@ -873,20 +882,21 @@
             200000
           ],
           "notes": [
-            "Max drawdown type (static vs trailing) is assumed static pending confirmation at fundingpips.com.",
+            "CORRECTED 2026-08-29 (was static, under-warning bug): FundingPips' own help centre states \"Max Trailing Loss Limit: 5% of your highest ever recorded equity. The trailing floor rises in step with your peak equity. It never moves down. Once your equity reaches 5% above the starting account size, the floor locks permanently at the starting account size.\" Encoded as intraday_trail (the source says \"equity\", not \"balance\", so the harsher intraday-peak type is the closer fit — falls back to EOD-equivalent behaviour on days without a logged equity_peak) with locks_at: start_balance, which locks the floor at exactly the account's starting balance once the trail reaches it — the schema mechanic FundingPips describes exactly. Source: FundingPips help centre (own docs).",
+            "CORRECTED 2026-08-29: daily loss basis changed pct_initial -> pct_prior_day. FundingPips' own docs: \"3% of the higher value between your opening balance or opening equity for that day.\"",
             "Instant funded (no evaluation) — modeled as a single phase representing the funded stage directly. Biweekly payouts at a 95% split."
           ],
           "phases": [
             {
               "profit_target_pct": 0,
               "daily_loss": {
-                "type": "pct_initial",
+                "type": "pct_prior_day",
                 "value": 3
               },
               "max_drawdown": {
-                "type": "static",
+                "type": "intraday_trail",
                 "value": 5,
-                "locks_at": "none"
+                "locks_at": "start_balance"
               },
               "min_trading_days": 0,
               "min_profitable_days": 7,
@@ -913,7 +923,7 @@
           "plan_name": "1-Step",
           "market": "forex",
           "verified": true,
-          "rules_verified": "2026-07-16",
+          "rules_verified": "2026-08-29",
           "account_sizes_usd": [
             100000
           ],
@@ -921,13 +931,14 @@
             "Summer Plan lineup — promotional naming, recheck at the5ers.com after the promo period.",
             "Max drawdown type (static vs trailing) is assumed static pending confirmation.",
             "The 50% best-day consistency rule applies both during evaluation and on the funded stage.",
-            "Payout cap of $2,000 applies on early cycles; split is 75/25; max 2 active accounts per trader."
+            "Payout cap of $2,000 applies on early cycles; split is 75/25; max 2 active accounts per trader.",
+            "CORRECTED 2026-08-29: daily loss basis changed pct_initial -> pct_prior_day. The5%ers' own FAQ (updated 23 Jul 2026): \"Daily Loss Limit: 3% of the previous day's closing balance.\""
           ],
           "phases": [
             {
               "profit_target_pct": 10,
               "daily_loss": {
-                "type": "pct_initial",
+                "type": "pct_prior_day",
                 "value": 3
               },
               "max_drawdown": {
@@ -950,7 +961,7 @@
           "plan_name": "2-Step (8/5)",
           "market": "forex",
           "verified": true,
-          "rules_verified": "2026-07-16",
+          "rules_verified": "2026-08-29",
           "account_sizes_usd": [
             100000
           ],
@@ -958,13 +969,14 @@
             "Summer Plan lineup — promotional naming, recheck at the5ers.com after the promo period.",
             "Max drawdown type (static vs trailing) is assumed static pending confirmation.",
             "No consistency rule during evaluation, but the funded stage carries a 50% best-day consistency rule — not modeled here, this preset covers the evaluation phases only.",
-            "A 10%/5% target variant of this 2-step exists at checkout — this preset models the 8%/5% variant."
+            "A 10%/5% target variant of this 2-step exists at checkout — this preset models the 8%/5% variant.",
+            "CORRECTED 2026-08-29: daily loss basis changed pct_initial -> pct_prior_day. The5%ers' own FAQ (updated 23 Jul 2026): \"Daily Loss Limit: 3% of the previous day's closing balance.\""
           ],
           "phases": [
             {
               "profit_target_pct": 8,
               "daily_loss": {
-                "type": "pct_initial",
+                "type": "pct_prior_day",
                 "value": 3
               },
               "max_drawdown": {
@@ -982,7 +994,7 @@
             {
               "profit_target_pct": 5,
               "daily_loss": {
-                "type": "pct_initial",
+                "type": "pct_prior_day",
                 "value": 3
               },
               "max_drawdown": {
@@ -1013,7 +1025,7 @@
           "plan_name": "1-Step Classic",
           "market": "crypto",
           "verified": true,
-          "rules_verified": "2026-07-15",
+          "rules_verified": "2026-08-29",
           "account_sizes_usd": [
             5000,
             10000,
@@ -1021,13 +1033,15 @@
             50000,
             100000
           ],
-          "notes": [],
+          "notes": [
+            "CORRECTED 2026-08-29 (was 4%, over-warning bug): Breakout's FAQ, dated 21 May 2026: \"The maximum daily loss limit is 3% across all three variants.\" Their pricing page agrees (3% on all three cards). Their Program Rules page still says 4%, but it is dated Jan 2025, is stale, and still describes the discontinued 2-Step product — the newer FAQ and pricing page were used per the rule that a terms page describing a dead product is unmaintained evidence. Chose 3%."
+          ],
           "phases": [
             {
               "profit_target_pct": 10,
               "daily_loss": {
                 "type": "pct_prior_day",
-                "value": 4
+                "value": 3
               },
               "max_drawdown": {
                 "type": "static",
@@ -1120,7 +1134,7 @@
           "plan_name": "2-Step",
           "market": "crypto",
           "verified": true,
-          "rules_verified": "2026-07-15",
+          "rules_verified": "2026-08-29",
           "account_sizes_usd": [
             5000,
             10000,
@@ -1129,7 +1143,9 @@
             100000
           ],
           "notes": [
-            "Source doc's official example (HWM 105K → floor 97K) confirms the 8% trailing floor caps AT starting balance once earned, matching the engine's locks_at: start_balance mechanic (same one TopStep uses) rather than trailing forever."
+            "Source doc's official example (HWM 105K → floor 97K) confirms the 8% trailing floor caps AT starting balance once earned, matching the engine's locks_at: start_balance mechanic (same one TopStep uses) rather than trailing forever.",
+            "DISCONTINUED 2026-08-29: Breakout no longer sells a 2-Step. Their FAQ, dated 21 May 2026: \"You may purchase a Breakout Evaluation in three variants: 1-Step Classic, 1-Step Pro, or 1-Step Turbo. Each variant is completed in a single step.\" Marked legacy: true and excluded from the new-challenge picker (see getPlansForFirm below) — kept for traders already running one bought before the change.",
+            "CORRECTED 2026-08-29 (was eod_trail, under-warning bug): Breakout's Program Rules: \"trails up with your High Water Mark. This occurs any time your High Water Mark increases, not at a single fixed time of the day.\" Encoded as intraday_trail. Note the fit is not exact: Breakout's High Water Mark is BALANCE excluding open positions, whereas this engine's intraday_trail follows peak equity including unrealised P&L (same mechanic Apex's intraday variant uses) — closest available fit, not identical."
           ],
           "phases": [
             {
@@ -1139,7 +1155,7 @@
                 "value": 5
               },
               "max_drawdown": {
-                "type": "eod_trail",
+                "type": "intraday_trail",
                 "value": 8,
                 "locks_at": "start_balance"
               },
@@ -1157,7 +1173,7 @@
                 "value": 5
               },
               "max_drawdown": {
-                "type": "eod_trail",
+                "type": "intraday_trail",
                 "value": 8,
                 "locks_at": "start_balance"
               },
@@ -1184,7 +1200,7 @@
           "plan_name": "1-Step Standard",
           "market": "crypto",
           "verified": true,
-          "rules_verified": "2026-07-16",
+          "rules_verified": "2026-08-29",
           "account_sizes_usd": [
             5000,
             10000,
@@ -1195,7 +1211,8 @@
           ],
           "notes": [
             "A \"qualifying\" trading day per HyroTrader's own rules requires a trade ≥5% of initial balance with PnL beyond ±1% — this app counts any logged day as a trading day, which is looser than that official definition.",
-            "Overall max loss (6%) is encoded as static — the official rules table doesn't indicate whether it trails."
+            "Overall max loss (6%) is encoded as static — the official rules table doesn't indicate whether it trails.",
+            "CORRECTED 2026-08-29 (was best_day_pct_of_total, over-warning bug): HyroTrader's own FAQ (\"Profit Distribution Rule\"): \"only positive profit generated during a trading day is considered, losses do not offset the daily profit contribution.\" Encoded as best_day_pct_of_positive_days."
           ],
           "phases": [
             {
@@ -1212,7 +1229,7 @@
               "min_trading_days": 5,
               "time_limit_days": null,
               "consistency": {
-                "type": "best_day_pct_of_total",
+                "type": "best_day_pct_of_positive_days",
                 "value": 40
               },
               "restrictions": [
@@ -1229,7 +1246,7 @@
           "plan_name": "1-Step Swing",
           "market": "crypto",
           "verified": true,
-          "rules_verified": "2026-07-16",
+          "rules_verified": "2026-08-29",
           "account_sizes_usd": [
             5000,
             10000,
@@ -1240,7 +1257,8 @@
           ],
           "notes": [
             "A \"qualifying\" trading day per HyroTrader's own rules requires a trade ≥5% of initial balance with PnL beyond ±1% — this app counts any logged day as a trading day, which is looser than that official definition.",
-            "Overall max loss (6%) is encoded as static — the official rules table doesn't indicate whether it trails."
+            "Overall max loss (6%) is encoded as static — the official rules table doesn't indicate whether it trails.",
+            "CORRECTED 2026-08-29 (was best_day_pct_of_total, over-warning bug): HyroTrader's own FAQ (\"Profit Distribution Rule\"): \"only positive profit generated during a trading day is considered, losses do not offset the daily profit contribution.\" Encoded as best_day_pct_of_positive_days."
           ],
           "phases": [
             {
@@ -1257,7 +1275,7 @@
               "min_trading_days": 5,
               "time_limit_days": null,
               "consistency": {
-                "type": "best_day_pct_of_total",
+                "type": "best_day_pct_of_positive_days",
                 "value": 40
               },
               "restrictions": [
@@ -1274,7 +1292,7 @@
           "plan_name": "2-Step Standard",
           "market": "crypto",
           "verified": true,
-          "rules_verified": "2026-07-16",
+          "rules_verified": "2026-08-29",
           "account_sizes_usd": [
             5000,
             10000,
@@ -1285,7 +1303,8 @@
           ],
           "notes": [
             "A \"qualifying\" trading day per HyroTrader's own rules requires a trade ≥5% of initial balance with PnL beyond ±1% — this app counts any logged day as a trading day, which is looser than that official definition.",
-            "Overall max loss (10%) is encoded as static — the official rules table doesn't indicate whether it trails."
+            "Overall max loss (10%) is encoded as static — the official rules table doesn't indicate whether it trails.",
+            "CORRECTED 2026-08-29 (was best_day_pct_of_total, over-warning bug): HyroTrader's own FAQ (\"Profit Distribution Rule\"): \"only positive profit generated during a trading day is considered, losses do not offset the daily profit contribution.\" Encoded as best_day_pct_of_positive_days."
           ],
           "phases": [
             {
@@ -1302,7 +1321,7 @@
               "min_trading_days": 5,
               "time_limit_days": null,
               "consistency": {
-                "type": "best_day_pct_of_total",
+                "type": "best_day_pct_of_positive_days",
                 "value": 40
               },
               "restrictions": [
@@ -1326,7 +1345,7 @@
               "min_trading_days": 5,
               "time_limit_days": null,
               "consistency": {
-                "type": "best_day_pct_of_total",
+                "type": "best_day_pct_of_positive_days",
                 "value": 40
               },
               "restrictions": [
@@ -1343,7 +1362,7 @@
           "plan_name": "2-Step Swing",
           "market": "crypto",
           "verified": true,
-          "rules_verified": "2026-07-16",
+          "rules_verified": "2026-08-29",
           "account_sizes_usd": [
             5000,
             10000,
@@ -1354,7 +1373,8 @@
           ],
           "notes": [
             "A \"qualifying\" trading day per HyroTrader's own rules requires a trade ≥5% of initial balance with PnL beyond ±1% — this app counts any logged day as a trading day, which is looser than that official definition.",
-            "Overall max loss (10%) is encoded as static — the official rules table doesn't indicate whether it trails."
+            "Overall max loss (10%) is encoded as static — the official rules table doesn't indicate whether it trails.",
+            "CORRECTED 2026-08-29 (was best_day_pct_of_total, over-warning bug): HyroTrader's own FAQ (\"Profit Distribution Rule\"): \"only positive profit generated during a trading day is considered, losses do not offset the daily profit contribution.\" Encoded as best_day_pct_of_positive_days."
           ],
           "phases": [
             {
@@ -1371,7 +1391,7 @@
               "min_trading_days": 5,
               "time_limit_days": null,
               "consistency": {
-                "type": "best_day_pct_of_total",
+                "type": "best_day_pct_of_positive_days",
                 "value": 40
               },
               "restrictions": [
@@ -1395,7 +1415,7 @@
               "min_trading_days": 5,
               "time_limit_days": null,
               "consistency": {
-                "type": "best_day_pct_of_total",
+                "type": "best_day_pct_of_positive_days",
                 "value": 40
               },
               "restrictions": [
@@ -1420,7 +1440,7 @@
           "plan_name": "2-Step",
           "market": "crypto",
           "verified": true,
-          "rules_verified": "2026-07-23",
+          "rules_verified": "2026-08-29",
           "account_sizes_usd": [
             5000,
             10000,
@@ -1431,7 +1451,8 @@
           ],
           "notes": [
             "Max drawdown type (static vs trailing) is not stated on Bitfunded's plan tables — encoded as static pending confirmation (tooltip-level gap).",
-            "Funded (Trader Stage) — daily 5%, max 8% — mirrors this preset's Phase 2 limits exactly; not modeled as a separate phase, this preset covers the 2-step evaluation only."
+            "Funded (Trader Stage) — daily 5%, max 8% — mirrors this preset's Phase 2 limits exactly; not modeled as a separate phase, this preset covers the 2-step evaluation only.",
+            "CHECKED 2026-08-29: Bitfunded does not publish its daily-loss basis (initial vs prior-day) anywhere on its plan tables — left as pct_initial pending confirmation; do not treat this as verified."
           ],
           "phases": [
             {
@@ -1477,7 +1498,7 @@
           "plan_name": "1-Step",
           "market": "crypto",
           "verified": true,
-          "rules_verified": "2026-07-23",
+          "rules_verified": "2026-08-29",
           "account_sizes_usd": [
             5000,
             10000,
@@ -1489,7 +1510,8 @@
           ],
           "notes": [
             "Max drawdown type (static vs trailing) is not stated on Bitfunded's plan tables — encoded as static pending confirmation (tooltip-level gap).",
-            "Funded stage — daily 4%, max 6% — mirrors this preset's evaluation limits exactly; not modeled as a separate phase, this preset covers the 1-step evaluation only."
+            "Funded stage — daily 4%, max 6% — mirrors this preset's evaluation limits exactly; not modeled as a separate phase, this preset covers the 1-step evaluation only.",
+            "CHECKED 2026-08-29: Bitfunded does not publish its daily-loss basis (initial vs prior-day) anywhere on its plan tables — left as pct_initial pending confirmation; do not treat this as verified."
           ],
           "phases": [
             {
@@ -1517,14 +1539,15 @@
           "plan_name": "Instant",
           "market": "crypto",
           "verified": true,
-          "rules_verified": "2026-07-23",
+          "rules_verified": "2026-08-29",
           "account_sizes_usd": [
             2500,
             5000
           ],
           "notes": [
             "Max drawdown type (static vs trailing) is not stated on Bitfunded's plan tables — encoded as static pending confirmation (tooltip-level gap).",
-            "No evaluation — funded (Trader Stage) from day one, 60% profit share (not modeled by the engine, informational only). Modeled as a single phase representing the funded stage directly."
+            "No evaluation — funded (Trader Stage) from day one, 60% profit share (not modeled by the engine, informational only). Modeled as a single phase representing the funded stage directly.",
+            "CHECKED 2026-08-29: Bitfunded does not publish its daily-loss basis (initial vs prior-day) anywhere on its plan tables — left as pct_initial pending confirmation; do not treat this as verified."
           ],
           "phases": [
             {
