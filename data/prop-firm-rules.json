@@ -1,7 +1,7 @@
 {
   "schema_version": "2.0",
   "dataset_name": "Prop Firm Rules Dataset",
-  "last_updated": "2026-09-04",
+  "last_updated": "2026-09-16",
   "maintainer": "FuturesEdge",
   "homepage": "https://futuresedgetrade.app",
   "license": "CC-BY-4.0",
@@ -1542,12 +1542,14 @@
           "rules_verified": "2026-08-29",
           "account_sizes_usd": [
             2500,
-            5000
+            5000,
+            10000
           ],
           "notes": [
             "Max drawdown type (static vs trailing) is not stated on Bitfunded's plan tables — encoded as static pending confirmation (tooltip-level gap).",
             "No evaluation — funded (Trader Stage) from day one, 60% profit share (not modeled by the engine, informational only). Modeled as a single phase representing the funded stage directly.",
-            "CHECKED 2026-08-29: Bitfunded does not publish its daily-loss basis (initial vs prior-day) anywhere on its plan tables — left as pct_initial pending confirmation; do not treat this as verified."
+            "CHECKED 2026-08-29: Bitfunded does not publish its daily-loss basis (initial vs prior-day) anywhere on its plan tables — left as pct_initial pending confirmation; do not treat this as verified.",
+            "CORRECTED 2026-09-06 (missing account size): Bitfunded's live Instant tab offers THREE sizes — Kickstart $2,500, Base $5,000 and Starter $10,000 ($449). We carried only $2,500 and $5,000, so a trader on a $10K Instant could not select their plan at all. Verified against Bitfunded's own Challenge Plans table. All other Instant values confirmed correct at the same time: no profit target, 3% daily, 6% max loss, 60% profit share, unlimited period, 1:5 leverage."
           ],
           "phases": [
             {
